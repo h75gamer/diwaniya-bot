@@ -1,6 +1,7 @@
 // بوت ديوانية 🌙 — قرآن وأذكار وسوالف
 require('dotenv').config();
 const http = require('http');
+const { Readable } = require('stream');
 const {
   Client, GatewayIntentBits, EmbedBuilder, SlashCommandBuilder, ActivityType, ChannelType,
   PermissionFlagsBits, ActionRowBuilder, ButtonBuilder, ButtonStyle,
@@ -61,6 +62,7 @@ function getState(guild) {
     const player = createAudioPlayer({ behaviors: { noSubscriber: NoSubscriberBehavior.Play } });
     s = { player, connection: null, mode: null, radioKey: DEFAULT_RADIO, channelId: null, stopped: false };
     player.on(AudioPlayerStatus.Idle, () => onIdle(guild));
+    player.on('stateChange', (o, n) => { if (o.status !== n.status) console.log(`🔊 المشغّل: ${o.status} → ${n.status}`); });
     player.on('error', (e) => { console.error('🔊 خطأ صوت:', e.message); setTimeout(() => onIdle(guild), 3000); });
     voice.set(guild.id, s);
   }
@@ -75,6 +77,8 @@ async function connect(guild, channel) {
   const connection = joinVoiceChannel({
     channelId: channel.id, guildId: guild.id, adapterCreator: guild.voiceAdapterCreator, selfDeaf: true,
   });
+  connection.on('stateChange', (o, n) => { if (o.status !== n.status) console.log(`🎧 الاتصال الصوتي: ${o.status} → ${n.status}`); });
+  connection.on('error', (e) => console.error('🎧 خطأ الاتصال الصوتي:', e.message));
   connection.on(VoiceConnectionStatus.Disconnected, async () => {
     try {
       await Promise.race([
@@ -89,8 +93,13 @@ async function connect(guild, channel) {
   return s;
 }
 
-function playUrl(s, url) {
-  const res = createAudioResource(url, { inputType: StreamType.Arbitrary });
+async function playUrl(s, url) {
+  s.startedAt = Date.now();
+  const r = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0 (DiwaniyaBot)' }, redirect: 'follow' });
+  console.log(`🌐 ${url} → ${r.status} ${r.headers.get('content-type') || ''}`);
+  if (!r.ok || !r.body) throw new Error(`الرابط رجّع ${r.status}`);
+  const res = createAudioResource(Readable.fromWeb(r.body), { inputType: StreamType.Arbitrary });
+  res.playStream.on('error', (e) => console.error('🔊 خطأ البث:', e.message));
   s.player.play(res);
 }
 
@@ -98,7 +107,7 @@ async function startRadio(guild, channel, key) {
   const s = await connect(guild, channel);
   const rec = key === 'khashia' ? D.KHASHIA_RADIO : D.RECITERS[key] || D.RECITERS[DEFAULT_RADIO];
   s.mode = 'radio'; s.radioKey = key; s.stopped = false;
-  playUrl(s, rec.radio);
+  await playUrl(s, rec.radio);
   return rec;
 }
 
@@ -108,7 +117,12 @@ function onIdle(guild) {
   const ch = guild.channels.cache.get(s.channelId);
   if (!ch) return;
   // بعد ما تخلص السورة (أو تنقطع الإذاعة) يرجع للإذاعة تلقائيًا
-  startRadio(guild, ch, s.mode === 'radio' ? s.radioKey : (s.radioKey || DEFAULT_RADIO)).catch(() => {});
+  const quick = Date.now() - (s.startedAt || 0) < 15000;
+  if (quick) console.log('⚠️ التشغيل وقف بسرعة، نعيد المحاولة بعد 15 ثانية');
+  setTimeout(() => {
+    startRadio(guild, ch, s.mode === 'radio' ? s.radioKey : (s.radioKey || DEFAULT_RADIO))
+      .catch((e) => console.error('⚠️ فشل تشغيل الإذاعة:', e.message));
+  }, quick ? 15000 : 1000);
 }
 
 const quranChannel = (guild) => guild.channels.cache.find(
@@ -253,7 +267,7 @@ client.on('interactionCreate', async (i) => {
         await i.deferReply();
         const s = await connect(i.guild, ch);
         s.mode = 'surah'; s.stopped = false;
-        playUrl(s, url);
+        await playUrl(s, url);
         const e = new EmbedBuilder().setColor(GREEN).setTitle(`📖 سورة ${D.SURAHS[n - 1]}`)
           .setDescription(`بصوت القارئ **${D.RECITERS[key].name}**\nفي ${ch} 🎧`)
           .setFooter({ text: 'بعد ما تخلص السورة ترجع الإذاعة تلقائيًا' });
