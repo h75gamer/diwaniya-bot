@@ -137,9 +137,10 @@ async function autoJoin(guild) {
 
 // ───────── مواقيت الصلاة ─────────
 const PRAYERS = { Fajr: 'الفجر', Dhuhr: 'الظهر', Asr: 'العصر', Maghrib: 'المغرب', Isha: 'العشاء' };
-let todayTimes = null; let timesDate = '';
-async function fetchTimes(city = CITY) {
-  const r = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=${encodeURIComponent(city)}&country=Saudi%20Arabia&method=4`);
+let todayTimes = null; let jafariTimes = null; let timesDate = '';
+// method 4 = تقويم أم القرى، method 0 = التقويم الجعفري
+async function fetchTimes(city = CITY, method = 4) {
+  const r = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=${encodeURIComponent(city)}&country=Saudi%20Arabia&method=${method}`);
   const j = await r.json();
   const t = {};
   for (const k of Object.keys(PRAYERS)) t[k] = String(j.data.timings[k]).slice(0, 5);
@@ -147,7 +148,11 @@ async function fetchTimes(city = CITY) {
   return { t, hijri: j.data.date?.hijri };
 }
 async function refreshTimes() {
-  try { const { t } = await fetchTimes(); todayTimes = t; timesDate = riyadhNow().toDateString(); }
+  try {
+    todayTimes = (await fetchTimes(CITY, 4)).t;
+    jafariTimes = (await fetchTimes(CITY, 0)).t;
+    timesDate = riyadhNow().toDateString();
+  }
   catch (e) { console.error('⚠️ فشل جلب المواقيت:', e.message); }
 }
 
@@ -165,12 +170,13 @@ const ayahRow = () => new ActionRowBuilder().addComponents(
 );
 
 // ───────── المسبحة ─────────
-const tasbihEmbed = (n) => new EmbedBuilder().setColor(GOLD).setTitle('📿 المسبحة')
-  .setDescription(`## ${D.TASBIH[Math.floor(n / 33) % 3]}\n\nالعدد: **${n}**`)
-  .setFooter({ text: '33 سبحان الله • 33 الحمد لله • 33 الله أكبر' });
-const tasbihRow = (n) => new ActionRowBuilder().addComponents(
-  new ButtonBuilder().setCustomId(`tasbih:${n}`).setLabel('سبّح').setEmoji('📿').setStyle(ButtonStyle.Success),
-  new ButtonBuilder().setCustomId('tasbih_reset').setLabel('تصفير').setStyle(ButtonStyle.Secondary),
+const tasbihEmbed = (n, k = 0) => new EmbedBuilder().setColor(GOLD).setTitle('📿 المسبحة')
+  .setDescription(`## ${D.TASBIH[k % D.TASBIH.length]}\n\nالعدد: **${n}**`)
+  .setFooter({ text: 'سبّح بالطريقة اللي تعرفها — زر «ذكر ثاني» يغيّر الذكر' });
+const tasbihRow = (n, k = 0) => new ActionRowBuilder().addComponents(
+  new ButtonBuilder().setCustomId(`tasbih:${n}:${k}`).setLabel('سبّح').setEmoji('📿').setStyle(ButtonStyle.Success),
+  new ButtonBuilder().setCustomId(`tasbih_next:${k}`).setLabel('ذكر ثاني').setStyle(ButtonStyle.Primary),
+  new ButtonBuilder().setCustomId(`tasbih_reset:${k}`).setLabel('تصفير').setStyle(ButtonStyle.Secondary),
 );
 
 // ───────── الأوامر ─────────
@@ -246,10 +252,18 @@ client.on('interactionCreate', async (i) => {
     if (i.isButton()) {
       if (i.customId === 'ayah_new') return i.update({ embeds: [ayahEmbed(await randomAyah())], components: [ayahRow()] });
       if (i.customId.startsWith('tasbih:')) {
-        const n = Number(i.customId.split(':')[1]) + 1;
-        return i.update({ embeds: [tasbihEmbed(n)], components: [tasbihRow(n)] });
+        const [, a, b] = i.customId.split(':');
+        const n = Number(a) + 1, k = Number(b || 0);
+        return i.update({ embeds: [tasbihEmbed(n, k)], components: [tasbihRow(n, k)] });
       }
-      if (i.customId === 'tasbih_reset') return i.update({ embeds: [tasbihEmbed(0)], components: [tasbihRow(0)] });
+      if (i.customId.startsWith('tasbih_next')) {
+        const k = (Number(i.customId.split(':')[1] || 0) + 1) % D.TASBIH.length;
+        return i.update({ embeds: [tasbihEmbed(0, k)], components: [tasbihRow(0, k)] });
+      }
+      if (i.customId.startsWith('tasbih_reset')) {
+        const k = Number(i.customId.split(':')[1] || 0);
+        return i.update({ embeds: [tasbihEmbed(0, k)], components: [tasbihRow(0, k)] });
+      }
       return;
     }
     if (!i.isChatInputCommand()) return;
@@ -302,15 +316,18 @@ client.on('interactionCreate', async (i) => {
       case 'مواقيت': {
         const city = i.options.getString('المدينة') || CITY;
         await i.deferReply();
-        const { t, hijri } = await fetchTimes(city);
+        const { t, hijri } = await fetchTimes(city, 4);
+        const j = (await fetchTimes(city, 0)).t;
+        const both = (k) => (t[k] === j[k] ? t[k] : `${t[k]} • ${j[k]}`);
         const label = { Riyadh: 'الرياض', Makkah: 'مكة المكرمة', Madinah: 'المدينة المنورة', Jeddah: 'جدة', Dammam: 'الدمام', Buraydah: 'بريدة', Abha: 'أبها', Tabuk: 'تبوك', Hail: 'حائل', Taif: 'الطائف' }[city] || city;
         const e = new EmbedBuilder().setColor(GREEN).setTitle(`🕌 مواقيت الصلاة — ${label}`)
           .addFields(
-            { name: 'الفجر', value: t.Fajr, inline: true }, { name: 'الشروق', value: t.Sunrise, inline: true },
-            { name: 'الظهر', value: t.Dhuhr, inline: true }, { name: 'العصر', value: t.Asr, inline: true },
-            { name: 'المغرب', value: t.Maghrib, inline: true }, { name: 'العشاء', value: t.Isha, inline: true },
-          );
-        if (hijri) e.setFooter({ text: `${hijri.day} ${hijri.month?.ar} ${hijri.year} هـ • تقويم أم القرى` });
+            { name: 'الفجر', value: both('Fajr'), inline: true }, { name: 'الشروق', value: t.Sunrise, inline: true },
+            { name: 'الظهر', value: both('Dhuhr'), inline: true }, { name: 'العصر', value: both('Asr'), inline: true },
+            { name: 'المغرب', value: both('Maghrib'), inline: true }, { name: 'العشاء', value: both('Isha'), inline: true },
+          )
+          .setDescription('إذا فيه وقتين: الأول **تقويم أم القرى** والثاني **التقويم الجعفري**');
+        if (hijri) e.setFooter({ text: `${hijri.day} ${hijri.month?.ar} ${hijri.year} هـ` });
         return i.editReply({ embeds: [e] });
       }
       case 'سالفة':
@@ -370,7 +387,7 @@ client.on('interactionCreate', async (i) => {
             { name: '💬 سوالف', value: '`/سالفة` • `/تحدي` • `/لو-خيروك` • `/قهوة`' },
             { name: '🛠️ أخرى', value: '`/اقتراح` • `/معلومات-السيرفر` • `/مين`' },
             { name: '📰 المجتمع', value: '`/دليل` دليل السيرفر • `/ملخص` نشرة اليوم/الأسبوع/الشهر • `/احصائياتي` تفاعلك وترتيبك' },
-            { name: '⏰ تلقائي', value: 'إذاعة قرآن دايمة في روم القرآن • تنبيه بكل صلاة • أذكار الصباح والمساء • آية اليوم • سؤال اليوم 9 مساءً • ترحيب ودليل للأعضاء الجدد • نشرة يومية وأسبوعية وشهرية' },
+            { name: '⏰ تلقائي', value: 'إذاعة قرآن دايمة في روم القرآن • تنبيه بكل صلاة (أم القرى والجعفري) • أذكار الصباح والمساء • آية اليوم • سؤال اليوم 9 مساءً • ترحيب ودليل للأعضاء الجدد • نشرة يومية وأسبوعية وشهرية' },
           );
         return i.reply({ embeds: [e] });
       }
@@ -397,10 +414,12 @@ async function tick() {
 
   if (todayTimes) {
     for (const [k, ar] of Object.entries(PRAYERS)) {
-      if (todayTimes[k] === t && once(k)) {
-        post('أذكار', { embeds: [new EmbedBuilder().setColor(GREEN).setTitle(`🕌 حان الآن موعد صلاة ${ar}`)
-          .setDescription('«أَرِحْنا بها يا بلال» — قوموا إلى صلاتكم 🤍').setFooter({ text: `${ar} ${t} • توقيت الرياض` })] });
-      }
+      const same = !jafariTimes || jafariTimes[k] === todayTimes[k];
+      const alert = (label) => post('أذكار', { embeds: [new EmbedBuilder().setColor(GREEN).setTitle(`🕌 حان الآن موعد صلاة ${ar}`)
+        .setDescription('﴿ إِنَّ الصَّلَاةَ كَانَتْ عَلَى الْمُؤْمِنِينَ كِتَابًا مَّوْقُوتًا ﴾ 🤍')
+        .setFooter({ text: `${ar} ${t}${label} • توقيت الرياض` })] });
+      if (todayTimes[k] === t && once(k)) alert(same ? '' : ' • تقويم أم القرى');
+      if (!same && jafariTimes[k] === t && once(`j-${k}`)) alert(' • التقويم الجعفري');
     }
   }
   if (t === '06:30' && once('sabah')) {
@@ -416,7 +435,7 @@ async function tick() {
   }
   if (now.getDay() === 5 && t === '10:00' && once('kahf')) {
     post('أذكار', { embeds: [new EmbedBuilder().setColor(GREEN).setTitle('🕌 جمعة مباركة')
-      .setDescription('لا تنسون قراءة **سورة الكهف** والإكثار من الصلاة على النبي ﷺ\nاكتب `/قران السورة:18` وتسمعها في الروم الصوتي 🎧')] });
+      .setDescription('لا تنسون القرآن والدعاء، والإكثار من الصلاة على محمد وآل محمد 🤍\nاكتب `/قران` واختر السورة اللي تحبها وتسمعها في الروم الصوتي 🎧')] });
   }
   if (t === '21:00' && once('q')) {
     const q = D.DAILY_QUESTIONS[Math.floor(now.getTime() / 86400000) % D.DAILY_QUESTIONS.length];
