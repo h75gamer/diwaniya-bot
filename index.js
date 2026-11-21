@@ -10,6 +10,7 @@ const {
   NoSubscriberBehavior, VoiceConnectionStatus, entersState, StreamType,
 } = require('@discordjs/voice');
 const D = require('./data');
+const C = require('./community');
 
 const TOKEN = process.env.DISCORD_TOKEN;
 const GUILD_ID = process.env.GUILD_ID;
@@ -190,9 +191,15 @@ const commands = [
   new SlashCommandBuilder().setName('مين').setDescription('معلومات عن عضو 👤')
     .addUserOption((o) => o.setName('العضو').setDescription('اختر العضو')),
   new SlashCommandBuilder().setName('مساعدة').setDescription('قائمة أوامر بوت الديوانية 📜'),
-].map((c) => c.toJSON());
+].map((c) => c.toJSON()).concat(C.commands);
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates] });
+const client = new Client({
+  intents: [
+    GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates,
+    GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildMessages,
+  ],
+});
+C.init(client);
 
 client.once('clientReady', async () => {
   console.log(`✅ ${client.user.tag} شغّال!`);
@@ -214,6 +221,7 @@ const findText = (guild, part) => guild.channels.cache.find(
 
 client.on('interactionCreate', async (i) => {
   try {
+    if (await C.handle(i)) return;
     // اقتراحات أسماء السور
     if (i.isAutocomplete()) {
       const q = String(i.options.getFocused() || '').trim();
@@ -347,7 +355,8 @@ client.on('interactionCreate', async (i) => {
             { name: '📿 أذكار', value: '`/ذكر` • `/دعاء` • `/مسبحة` • `/مواقيت`' },
             { name: '💬 سوالف', value: '`/سالفة` • `/تحدي` • `/لو-خيروك` • `/قهوة`' },
             { name: '🛠️ أخرى', value: '`/اقتراح` • `/معلومات-السيرفر` • `/مين`' },
-            { name: '⏰ تلقائي', value: 'إذاعة قرآن دايمة في روم القرآن • تنبيه بكل صلاة • أذكار الصباح والمساء • آية اليوم • سؤال اليوم 9 مساءً' },
+            { name: '📰 المجتمع', value: '`/دليل` دليل السيرفر • `/ملخص` نشرة اليوم/الأسبوع/الشهر • `/احصائياتي` تفاعلك وترتيبك' },
+            { name: '⏰ تلقائي', value: 'إذاعة قرآن دايمة في روم القرآن • تنبيه بكل صلاة • أذكار الصباح والمساء • آية اليوم • سؤال اليوم 9 مساءً • ترحيب ودليل للأعضاء الجدد • نشرة يومية وأسبوعية وشهرية' },
           );
         return i.reply({ embeds: [e] });
       }
