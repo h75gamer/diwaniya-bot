@@ -28,6 +28,12 @@ const RECITERS = {
   qatami: { name: 'ناصر القطامي', radio: 'https://backup.qurango.net/radio/nasser_alqatami' },
   ghamdi: { name: 'سعد الغامدي', radio: 'https://backup.qurango.net/radio/saad_alghamdi' },
   jaleel: { name: 'خالد الجليل', radio: 'https://backup.qurango.net/radio/khalid_aljileel' },
+  // شهريار پرهيزگار: ما له إذاعة مباشرة، فالبوت يشغّل السور بالترتيب 1 → 114 ويعيد (من Quran Central)
+  parhizgar: {
+    name: 'شهريار پرهيزگار',
+    radio: null,
+    surahUrl: (n) => `https://podcasts.qurancentral.com/shahriar-parhizgar/shahriar-parhizgar-${String(n).padStart(3, '0')}-muslimcentral.com.mp3`,
+  },
 };
 const KHASHIA_RADIO = { name: 'تلاوات خاشعة', radio: 'https://backup.qurango.net/radio/salma' };
 
