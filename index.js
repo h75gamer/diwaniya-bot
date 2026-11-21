@@ -51,7 +51,8 @@ async function loadReciters() {
     console.log(`📖 تم تحميل ${Object.keys(reciterServers).length} قارئ`);
   } catch (e) { console.error('⚠️ فشل تحميل القرّاء:', e.message); }
 }
-const surahUrl = (key, n) => reciterServers[key] && `${reciterServers[key]}${String(n).padStart(3, '0')}.mp3`;
+const surahUrl = (key, n) => (D.RECITERS[key]?.surahUrl ? D.RECITERS[key].surahUrl(n)
+  : reciterServers[key] && `${reciterServers[key]}${String(n).padStart(3, '0')}.mp3`);
 
 // ───────── الصوت ─────────
 const voice = new Map(); // guildId -> { connection, player, mode, radioKey, channelId, stopped }
@@ -106,8 +107,10 @@ async function playUrl(s, url) {
 async function startRadio(guild, channel, key) {
   const s = await connect(guild, channel);
   const rec = key === 'khashia' ? D.KHASHIA_RADIO : D.RECITERS[key] || D.RECITERS[DEFAULT_RADIO];
+  if (s.radioKey !== key || !s.radioSurah) s.radioSurah = 1;
   s.mode = 'radio'; s.radioKey = key; s.stopped = false;
-  await playUrl(s, rec.radio);
+  // قارئ بدون إذاعة مباشرة: نشغّل السور بالترتيب كأنها إذاعة
+  await playUrl(s, rec.radio || surahUrl(key, s.radioSurah));
   return rec;
 }
 
@@ -117,6 +120,8 @@ function onIdle(guild) {
   const ch = guild.channels.cache.get(s.channelId);
   if (!ch) return;
   // بعد ما تخلص السورة (أو تنقطع الإذاعة) يرجع للإذاعة تلقائيًا
+  const rr = D.RECITERS[s.radioKey];
+  if (s.mode === 'radio' && rr && !rr.radio) s.radioSurah = ((s.radioSurah || 1) % 114) + 1;
   const quick = Date.now() - (s.startedAt || 0) < 15000;
   if (quick) console.log('⚠️ التشغيل وقف بسرعة، نعيد المحاولة بعد 15 ثانية');
   setTimeout(() => {
