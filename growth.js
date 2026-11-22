@@ -44,8 +44,27 @@ function gameVoiceChannel(g) {
 }
 
 // ───────── روم الشراكات ─────────
+function partnersEmbed() {
+  return new EmbedBuilder().setColor(COLOR).setTitle('🤝 شراكات ديوانية')
+    .setDescription([
+      'هنا سيرفرات صديقة نتبادل معها الإعلان 🌙',
+      '',
+      '**شروط الشراكة:**',
+      '• سيرفر عربي ونظيف — لا محتوى مخالف ولا طائفية ولا عنصرية',
+      '• إعلاننا ينزل عندكم في روم شراكات، وإعلانكم ينزل هنا',
+      '• تبي شراكة؟ افتح تذكرة **🤝 طلب شراكة** من روم 🎫│فتح-تذكرة',
+    ].join('\n'));
+}
+
 async function ensurePartners(g) {
-  if (textCh(g, 'شراكات')) return;
+  const existing = textCh(g, 'شراكات');
+  if (existing) {
+    // تحديث رسالة الشروط القديمة إذا كانت تقول «كلّم الإدارة بالخاص»
+    const pins = await Promise.resolve().then(() => existing.messages.fetchPinned()).catch(() => null);
+    const old = pins?.find((m) => m.author.id === client.user.id && m.embeds[0]?.description?.includes('كلّم الإدارة بالخاص'));
+    if (old) await old.edit({ embeds: [partnersEmbed()] }).catch(() => {});
+    return;
+  }
   const near = textCh(g, 'الإعلانات');
   const ch = await g.channels.create({
     name: PARTNERS_CHANNEL,
@@ -57,15 +76,7 @@ async function ensurePartners(g) {
       { id: client.user.id, allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages, PermissionFlagsBits.EmbedLinks, PermissionFlagsBits.ManageMessages] },
     ],
   });
-  const msg = await ch.send({ embeds: [new EmbedBuilder().setColor(COLOR).setTitle('🤝 شراكات ديوانية')
-    .setDescription([
-      'هنا سيرفرات صديقة نتبادل معها الإعلان 🌙',
-      '',
-      '**شروط الشراكة:**',
-      '• سيرفر عربي ونظيف — لا محتوى مخالف ولا طائفية ولا عنصرية',
-      '• إعلاننا ينزل عندكم في روم شراكات، وإعلانكم ينزل هنا',
-      '• تبي شراكة؟ كلّم الإدارة بالخاص',
-    ].join('\n'))] });
+  const msg = await ch.send({ embeds: [partnersEmbed()] });
   await msg.pin().catch(() => {});
 }
 
