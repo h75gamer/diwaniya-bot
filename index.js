@@ -15,6 +15,7 @@ const C = require('./community');
 const A = require('./ai');
 const G = require('./growth');
 const T = require('./tickets');
+const EV = require('./events');
 
 const TOKEN = process.env.DISCORD_TOKEN;
 const GUILD_ID = process.env.GUILD_ID;
@@ -231,7 +232,7 @@ const commands = [
   new SlashCommandBuilder().setName('مين').setDescription('معلومات عن عضو 👤')
     .addUserOption((o) => o.setName('العضو').setDescription('اختر العضو')),
   new SlashCommandBuilder().setName('مساعدة').setDescription('قائمة أوامر بوت الديوانية 📜'),
-].map((c) => c.toJSON()).concat(C.commands, G.commands);
+].map((c) => c.toJSON()).concat(C.commands, G.commands, EV.commands);
 
 const client = new Client({
   intents: [
@@ -244,6 +245,7 @@ C.init(client);
 A.init(client);
 G.init(client);
 T.init(client);
+EV.init(client);
 
 client.once('clientReady', async () => {
   console.log(`✅ ${client.user.tag} شغّال!`);
@@ -268,6 +270,7 @@ client.on('interactionCreate', async (i) => {
     if (await C.handle(i)) return;
     if (await G.handle(i)) return;
     if (await T.handle(i)) return;
+    if (await EV.handle(i)) return;
     // اقتراحات أسماء السور
     if (i.isAutocomplete()) {
       const q = String(i.options.getFocused() || '').trim();
@@ -416,6 +419,7 @@ client.on('interactionCreate', async (i) => {
             { name: '🤖 ذكاء الديوانية', value: 'اكتب في روم «سولف-مع-الذكاء» أو منشن البوت بأي روم ويسولف معك بلهجتنا' },
             { name: '🎮 سهرة الألعاب', value: '`/سهرة` موعد السهرة الأسبوعية وتفعيل التنبيه' },
             { name: '🎫 التذاكر', value: 'تحتاج الإدارة؟ افتح تذكرة من روم «فتح-تذكرة»' },
+            { name: '🎯 الفعاليات والمستويات', value: '`/مستواي` `/المتصدرين` `/يومي` `/اعتراف` — وتحديات يومية في روم «تحديات» ولعبة العد' },
             { name: '⏰ تلقائي', value: 'إذاعة قرآن دايمة في روم القرآن • تنبيه بكل صلاة (أم القرى والجعفري) • أذكار الصباح والمساء • آية اليوم • سؤال اليوم 9 مساءً • ترحيب ودليل للأعضاء الجدد • نشرة يومية وأسبوعية وشهرية' },
           );
         return i.reply({ embeds: [e] });
