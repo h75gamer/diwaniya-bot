@@ -12,6 +12,7 @@ const {
 } = require('@discordjs/voice');
 const D = require('./data');
 const C = require('./community');
+const A = require('./ai');
 
 const TOKEN = process.env.DISCORD_TOKEN;
 const GUILD_ID = process.env.GUILD_ID;
@@ -222,9 +223,11 @@ const client = new Client({
   intents: [
     GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates,
     GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent,
   ],
 });
 C.init(client);
+A.init(client);
 
 client.once('clientReady', async () => {
   console.log(`✅ ${client.user.tag} شغّال!`);
@@ -392,6 +395,7 @@ client.on('interactionCreate', async (i) => {
             { name: '💬 سوالف', value: '`/سالفة` • `/تحدي` • `/لو-خيروك` • `/قهوة`' },
             { name: '🛠️ أخرى', value: '`/اقتراح` • `/معلومات-السيرفر` • `/مين`' },
             { name: '📰 المجتمع', value: '`/دليل` دليل السيرفر • `/ملخص` نشرة اليوم/الأسبوع/الشهر • `/احصائياتي` تفاعلك وترتيبك' },
+            { name: '🤖 ذكاء الديوانية', value: 'اكتب في روم «سولف-مع-الذكاء» أو منشن البوت بأي روم ويسولف معك بلهجتنا' },
             { name: '⏰ تلقائي', value: 'إذاعة قرآن دايمة في روم القرآن • تنبيه بكل صلاة (أم القرى والجعفري) • أذكار الصباح والمساء • آية اليوم • سؤال اليوم 9 مساءً • ترحيب ودليل للأعضاء الجدد • نشرة يومية وأسبوعية وشهرية' },
           );
         return i.reply({ embeds: [e] });
