@@ -60,7 +60,7 @@ async function ensurePartners(g) {
   const existing = textCh(g, 'شراكات');
   if (existing) {
     // تحديث رسالة الشروط القديمة إذا كانت تقول «كلّم الإدارة بالخاص»
-    const pins = await Promise.resolve().then(() => existing.messages.fetchPinned()).catch(() => null);
+    const pins = await Promise.resolve().then(() => (existing.messages.fetchPins ? existing.messages.fetchPins().then((r) => r.items?.map((x) => x.message) ?? r) : existing.messages.fetchPinned())).catch(() => null);
     const old = pins?.find((m) => m.author.id === client.user.id && m.embeds[0]?.description?.includes('كلّم الإدارة بالخاص'));
     if (old) await old.edit({ embeds: [partnersEmbed()] }).catch(() => {});
     return;
