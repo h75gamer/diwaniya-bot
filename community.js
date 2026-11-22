@@ -122,7 +122,7 @@ async function saveData(force = false) {
 
 // ───────── الإحصائيات ─────────
 function aggregate(keys) {
-  const t = { messages: 0, users: {}, channels: {}, voice: {}, joins: 0, leaves: 0 };
+  const t = { messages: 0, users: {}, channels: {}, voice: {}, invites: {}, joins: 0, leaves: 0 };
   for (const k of keys) {
     const d = data.days[k];
     if (!d) continue;
@@ -130,6 +130,7 @@ function aggregate(keys) {
     for (const [id, v] of Object.entries(d.users)) t.users[id] = (t.users[id] || 0) + v;
     for (const [id, v] of Object.entries(d.channels)) t.channels[id] = (t.channels[id] || 0) + v;
     for (const [id, v] of Object.entries(d.voice)) t.voice[id] = (t.voice[id] || 0) + v;
+    for (const [id, v] of Object.entries(d.invites || {})) t.invites[id] = (t.invites[id] || 0) + v;
   }
   t.active = new Set([...Object.keys(t.users), ...Object.keys(t.voice)]).size;
   t.voiceMin = Object.values(t.voice).reduce((a, b) => a + b, 0);
@@ -181,6 +182,7 @@ function buildSummary(guild, period) {
       { name: '🏆 الأكثر تفاعلًا', value: topList(cur.users, 3, (id, v) => `<@${id}> — ${v} رسالة`) },
       { name: '📍 أنشط الرومات', value: topList(cur.channels, 3, (id, v) => `<#${id}> — ${v} رسالة`) },
       { name: '🎧 نجوم الصوت', value: topList(cur.voice, 3, (id, v) => `<@${id}> — ${hours(v)}`) },
+      { name: '📨 أكثر من جاب أعضاء', value: topList(cur.invites, 3, (id, v) => `<@${id}> — ${v} عضو`) },
     )
     .setFooter({ text: 'بوت الديوانية 🌙' })
     .setTimestamp();
@@ -260,6 +262,7 @@ function guideEmbed(guild, section) {
       '`/دليل` — هذا الدليل',
       '`/ملخص` — نشرة اليوم أو الأسبوع أو الشهر',
       '`/احصائياتي` — تفاعلك وترتيبك',
+      '`/سهرة` — موعد سهرة الألعاب الأسبوعية وتفعيل التنبيه 🎮',
       '`/مساعدة` — كل أوامر البوت',
       '🤖 **ذكاء الديوانية**: اكتب في روم «سولف-مع-الذكاء» أو منشن البوت ويسولف معك',
     ].join('\n'));
@@ -338,6 +341,28 @@ async function tick() {
   if (t.minute % 10 === 0) await saveData();
 }
 
+// ───────── تتبّع الدعوات (مين جاب مين) ─────────
+const inviteUses = new Map(); // code -> uses
+async function cacheInvites(guild) {
+  const invs = await guild.invites.fetch();
+  inviteUses.clear();
+  for (const inv of invs.values()) inviteUses.set(inv.code, inv.uses || 0);
+}
+async function findInviter(guild) {
+  try {
+    const invs = await guild.invites.fetch();
+    let inviter = null;
+    for (const inv of invs.values()) {
+      if ((inv.uses || 0) > (inviteUses.get(inv.code) || 0)) inviter = inv.inviter;
+      inviteUses.set(inv.code, inv.uses || 0);
+    }
+    return inviter;
+  } catch (e) {
+    console.error('⚠\ufe0f invites:', e.message);
+    return null;
+  }
+}
+
 // ───────── رسالة التعريف الخاصة ─────────
 async function sendTour(member) {
   const dm = new EmbedBuilder()
@@ -385,6 +410,7 @@ function init(c) {
     await newsChannel(guild).catch((e) => console.error('⚠️ newsChannel:', e.message));
     console.log('✅ الدليل والنشرة جاهزين');
     tourExistingMembers(guild).catch((e) => console.error('⚠\ufe0f tourAll:', e.message));
+    cacheInvites(guild).catch((e) => console.error('⚠\ufe0f invites (يحتاج صلاحية Manage Server):', e.message));
     setInterval(() => tick().catch((e) => console.error('⚠️ community tick:', e.message)), 60 * 1000);
   });
 
@@ -397,9 +423,18 @@ function init(c) {
     dirty = true;
   });
 
+  client.on('inviteCreate', (inv) => inviteUses.set(inv.code, inv.uses || 0));
+  client.on('inviteDelete', (inv) => inviteUses.delete(inv.code));
+
   client.on('guildMemberAdd', async (member) => {
     if (member.user.bot) return;
-    today().joins++;
+    const d0 = today();
+    d0.joins++;
+    const inviter = await findInviter(member.guild);
+    if (inviter && !inviter.bot && inviter.id !== member.id) {
+      d0.invites = d0.invites || {};
+      d0.invites[inviter.id] = (d0.invites[inviter.id] || 0) + 1;
+    }
     dirty = true;
     const row = new ActionRowBuilder().addComponents(
       new ButtonBuilder().setCustomId('guide_open').setLabel('دليل السيرفر').setEmoji('📖').setStyle(ButtonStyle.Primary),
