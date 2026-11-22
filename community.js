@@ -338,6 +338,42 @@ async function tick() {
   if (t.minute % 10 === 0) await saveData();
 }
 
+// ───────── رسالة التعريف الخاصة ─────────
+async function sendTour(member) {
+  const dm = new EmbedBuilder()
+    .setColor(COLOR)
+    .setTitle(`🌙 حيّاك الله في ${member.guild.name}!`)
+    .setDescription('نورتنا يا الغالي 🤍\n\n**تبي تتعرف على السيرفر؟**')
+    .setThumbnail(member.guild.iconURL());
+  const dmRow = new ActionRowBuilder().addComponents(
+    new ButtonBuilder().setCustomId('dm_tour_yes').setLabel('إيه، عرّفني').setEmoji('✅').setStyle(ButtonStyle.Success),
+    new ButtonBuilder().setCustomId('dm_tour_no').setLabel('لا، شكرًا').setEmoji('❌').setStyle(ButtonStyle.Secondary),
+  );
+  try {
+    await member.send({ embeds: [dm], components: [dmRow] });
+    return true;
+  } catch {
+    return false; // العضو قافل الخاص
+  }
+}
+
+// يرسل التعريف مرة وحدة بس لكل الأعضاء اللي كانوا موجودين قبل التحديث
+async function tourExistingMembers(guild) {
+  if (data.sent.tourAll) return;
+  data.sent.tourAll = new Date().toISOString();
+  dirty = true;
+  await saveData(true);
+  const members = await guild.members.fetch().catch(() => null);
+  if (!members) return;
+  let ok = 0, fail = 0;
+  for (const m of members.values()) {
+    if (m.user.bot) continue;
+    if (await sendTour(m)) ok++; else fail++;
+    await new Promise((r) => setTimeout(r, 1500));
+  }
+  console.log(`📨 أُرسل التعريف لـ ${ok} عضو (${fail} قافلين الخاص)`);
+}
+
 // ───────── التشغيل ─────────
 function init(c) {
   client = c;
@@ -348,6 +384,7 @@ function init(c) {
     await loadData(guild);
     await newsChannel(guild).catch((e) => console.error('⚠️ newsChannel:', e.message));
     console.log('✅ الدليل والنشرة جاهزين');
+    tourExistingMembers(guild).catch((e) => console.error('⚠\ufe0f tourAll:', e.message));
     setInterval(() => tick().catch((e) => console.error('⚠️ community tick:', e.message)), 60 * 1000);
   });
 
@@ -374,16 +411,7 @@ function init(c) {
       .setThumbnail(member.user.displayAvatarURL());
     const ch = welcomeChannel(member.guild);
     if (ch) await ch.send({ content: `${member}`, embeds: [e], components: [row] }).catch((er) => console.error('⚠️ welcome:', er.message));
-    const dm = new EmbedBuilder()
-      .setColor(COLOR)
-      .setTitle(`🌙 حيّاك الله في ${member.guild.name}!`)
-      .setDescription('نورتنا يا الغالي 🤍\n\n**تبي تتعرف على السيرفر؟**')
-      .setThumbnail(member.guild.iconURL());
-    const dmRow = new ActionRowBuilder().addComponents(
-      new ButtonBuilder().setCustomId('dm_tour_yes').setLabel('إيه، عرّفني').setEmoji('✅').setStyle(ButtonStyle.Success),
-      new ButtonBuilder().setCustomId('dm_tour_no').setLabel('لا، شكرًا').setEmoji('❌').setStyle(ButtonStyle.Secondary),
-    );
-    await member.send({ embeds: [dm], components: [dmRow] }).catch(() => {});
+    await sendTour(member);
   });
 
   client.on('guildMemberRemove', (member) => {
