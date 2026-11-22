@@ -119,6 +119,37 @@ function slug(s) {
   return (s || 'عضو').toLowerCase().replace(/[^a-z0-9\u0600-\u06ff]+/g, '-').replace(/^-|-$/g, '').slice(0, 20) || 'عضو';
 }
 
+async function sendWelcome(ch, uid, key) {
+  const g = ch.guild;
+  const t = TYPES[key] || TYPES.ask;
+  const lines = [`هلا <@${uid}> 🌙 هذي تذكرتك الخاصة، الإدارة بترد عليك قريب.`, ''];
+  if (key === 'partner') {
+    lines.push(
+      '**🤝 عشان نمشي الشراكة بسرعة، أرسل هنا:**',
+      '1️⃣ إعلان سيرفرك جاهز (نص الإعلان + الرابط)',
+      '2️⃣ وين بتنزلون إعلاننا عندكم (اسم الروم)',
+      '',
+      '**الشروط:** سيرفر عربي ونظيف — بدون محتوى مخالف ولا طائفية ولا عنصرية.',
+      'بعد الموافقة ينزل إعلانكم في روم الشراكات، وإعلاننا ينزل عندكم 🤍',
+    );
+  } else if (key === 'report') {
+    lines.push('اكتب **مين** و**وش صار** و**وين**، وأرفق صورة إذا عندك 📸', 'بلاغك سري ومحد يشوفه غير الإدارة.');
+  } else {
+    lines.push('اكتب طلبك بالتفصيل، وأرفق صورة إذا تساعد 📸');
+  }
+  const row = new ActionRowBuilder().addComponents(
+    new ButtonBuilder().setCustomId('tk_claim').setLabel('استلام').setEmoji('🙋').setStyle(ButtonStyle.Success),
+    new ButtonBuilder().setCustomId('tk_close').setLabel('إغلاق').setEmoji('🔒').setStyle(ButtonStyle.Danger),
+  );
+  await ch.send({
+    content: [...new Set([uid, g.ownerId])].map((x) => `<@${x}>`).join(' '),
+    embeds: [new EmbedBuilder().setColor(COLOR).setTitle(`${t.emoji} تذكرة ${t.label}`).setDescription(lines.join('\n'))
+      .setFooter({ text: 'الإدارة تستلم التذكرة • أي واحد منكم يقدر يقفلها لما تخلص' })],
+    components: [row],
+    allowedMentions: { users: [...new Set([uid, g.ownerId])] },
+  });
+}
+
 async function openTicket(i, key) {
   const g = i.guild;
   const t = TYPES[key];
@@ -139,32 +170,12 @@ async function openTicket(i, key) {
       permissionOverwrites: [...privateOverwrites(g), { id: i.user.id, allow: MEMBER_PERMS }],
     });
 
-    const lines = [`هلا <@${i.user.id}> 🌙 هذي تذكرتك الخاصة، الإدارة بترد عليك قريب.`, ''];
-    if (key === 'partner') {
-      lines.push(
-        '**🤝 عشان نمشي الشراكة بسرعة، أرسل هنا:**',
-        '1️⃣ إعلان سيرفرك جاهز (نص الإعلان + الرابط)',
-        '2️⃣ وين بتنزلون إعلاننا عندكم (اسم الروم)',
-        '',
-        '**الشروط:** سيرفر عربي ونظيف — بدون محتوى مخالف ولا طائفية ولا عنصرية.',
-        'بعد الموافقة ينزل إعلانكم في روم الشراكات، وإعلاننا ينزل عندكم 🤍',
-      );
-    } else if (key === 'report') {
-      lines.push('اكتب **مين** و**وش صار** و**وين**، وأرفق صورة إذا عندك 📸', 'بلاغك سري ومحد يشوفه غير الإدارة.');
-    } else {
-      lines.push('اكتب طلبك بالتفصيل، وأرفق صورة إذا تساعد 📸');
+    try {
+      await sendWelcome(ch, i.user.id, key);
+    } catch (e) {
+      await ch.delete('فشل فتح التذكرة').catch(() => {});
+      throw e;
     }
-    const row = new ActionRowBuilder().addComponents(
-      new ButtonBuilder().setCustomId('tk_claim').setLabel('استلام').setEmoji('🙋').setStyle(ButtonStyle.Success),
-      new ButtonBuilder().setCustomId('tk_close').setLabel('إغلاق').setEmoji('🔒').setStyle(ButtonStyle.Danger),
-    );
-    await ch.send({
-      content: `<@${i.user.id}> <@${g.ownerId}>`,
-      embeds: [new EmbedBuilder().setColor(COLOR).setTitle(`${t.emoji} تذكرة ${t.label}`).setDescription(lines.join('\n'))
-        .setFooter({ text: 'الإدارة تستلم التذكرة • أي واحد منكم يقدر يقفلها لما تخلص' })],
-      components: [row],
-      allowedMentions: { users: [i.user.id, g.ownerId] },
-    });
     await i.editReply({ content: `✅ انفتحت تذكرتك: <#${ch.id}>` });
   } catch (e) {
     console.error('⚠️ ticket open:', e.message);
@@ -269,6 +280,13 @@ function init(c) {
       await ensureCategory(g);
       await ensureLog(g);
       await ensurePanel(g);
+      // إصلاح أي تذكرة انفتحت بدون رسالة البوت (أزرار الإغلاق)
+      for (const ch of g.channels.cache.filter(isTicket).values()) {
+        const msgs = await ch.messages.fetch({ limit: 10 }).catch(() => null);
+        if (msgs && !msgs.some((m) => m.author.id === client.user.id)) {
+          await sendWelcome(ch, ownerOf(ch), typeOf(ch)).catch((e) => console.error('⚠️ ticket repair:', e.message));
+        }
+      }
       console.log('🎫 نظام التذاكر جاهز');
     } catch (e) { console.error('⚠️ tickets:', e.message); }
   });
