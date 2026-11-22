@@ -261,6 +261,7 @@ function guideEmbed(guild, section) {
       '`/ملخص` — نشرة اليوم أو الأسبوع أو الشهر',
       '`/احصائياتي` — تفاعلك وترتيبك',
       '`/مساعدة` — كل أوامر البوت',
+      '🤖 **ذكاء الديوانية**: اكتب في روم «سولف-مع-الذكاء» أو منشن البوت ويسولف معك',
     ].join('\n'));
   } else {
     e.setTitle(`📖 دليل ${guild.name}`)
@@ -295,6 +296,17 @@ async function handle(i) {
     if (i.commandName === 'ملخص') { await i.reply({ embeds: [buildSummary(guild, i.options.getString('الفترة'))] }); return true; }
     if (i.commandName === 'احصائياتي') { await i.reply({ embeds: [myStats(i.user)], flags: MessageFlags.Ephemeral }); return true; }
     return false;
+  }
+  if (i.isButton() && i.customId === 'dm_tour_yes') {
+    await i.update(guidePayload(guild, 'home'));
+    return true;
+  }
+  if (i.isButton() && i.customId === 'dm_tour_no') {
+    await i.update({
+      embeds: [new EmbedBuilder().setColor(COLOR).setDescription('ولا يهمك 🤍 إذا احتجت شي بأي وقت اكتب `/دليل` في السيرفر، أو سولف مع **ذكاء الديوانية** في روم «سولف-مع-الذكاء» 🤖')],
+      components: [],
+    });
+    return true;
   }
   if (i.isButton() && i.customId === 'guide_open') {
     await i.reply({ ...guidePayload(guild), flags: MessageFlags.Ephemeral });
@@ -362,7 +374,16 @@ function init(c) {
       .setThumbnail(member.user.displayAvatarURL());
     const ch = welcomeChannel(member.guild);
     if (ch) await ch.send({ content: `${member}`, embeds: [e], components: [row] }).catch((er) => console.error('⚠️ welcome:', er.message));
-    await member.send(guidePayload(member.guild, 'home')).catch(() => {});
+    const dm = new EmbedBuilder()
+      .setColor(COLOR)
+      .setTitle(`🌙 حيّاك الله في ${member.guild.name}!`)
+      .setDescription('نورتنا يا الغالي 🤍\n\n**تبي تتعرف على السيرفر؟**')
+      .setThumbnail(member.guild.iconURL());
+    const dmRow = new ActionRowBuilder().addComponents(
+      new ButtonBuilder().setCustomId('dm_tour_yes').setLabel('إيه، عرّفني').setEmoji('✅').setStyle(ButtonStyle.Success),
+      new ButtonBuilder().setCustomId('dm_tour_no').setLabel('لا، شكرًا').setEmoji('❌').setStyle(ButtonStyle.Secondary),
+    );
+    await member.send({ embeds: [dm], components: [dmRow] }).catch(() => {});
   });
 
   client.on('guildMemberRemove', (member) => {
