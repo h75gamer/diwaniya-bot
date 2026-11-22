@@ -112,8 +112,21 @@ async function startRadio(guild, channel, key) {
   const rec = key === 'khashia' ? D.KHASHIA_RADIO : D.RECITERS[key] || D.RECITERS[DEFAULT_RADIO];
   if (s.radioKey !== key || !s.radioSurah) s.radioSurah = 1;
   s.mode = 'radio'; s.radioKey = key; s.stopped = false;
-  // قارئ بدون إذاعة مباشرة: نشغّل السور بالترتيب كأنها إذاعة
-  await playUrl(s, rec.radio || surahUrl(key, s.radioSurah));
+  // الإذاعة المباشرة أولًا، وإذا كانت واقفة (أو القارئ ما عنده إذاعة) نشغّل السور بالترتيب كأنها إذاعة
+  if (rec.radio && !(s.radioFallbackUntil > Date.now())) {
+    try {
+      await playUrl(s, rec.radio);
+      s.surahMode = false;
+      return rec;
+    } catch (e) {
+      console.error('⚠️ الإذاعة المباشرة واقفة، نشغّل السور بالترتيب ونرجع نجربها بعد 30 دقيقة:', e.message);
+      s.radioFallbackUntil = Date.now() + 30 * 60 * 1000;
+    }
+  }
+  s.surahMode = true;
+  const url = surahUrl(key, s.radioSurah) || surahUrl(DEFAULT_RADIO, s.radioSurah);
+  if (!url) throw new Error('ما فيه رابط سور متاح للحين');
+  await playUrl(s, url);
   return rec;
 }
 
@@ -123,13 +136,12 @@ function onIdle(guild) {
   const ch = guild.channels.cache.get(s.channelId);
   if (!ch) return;
   // بعد ما تخلص السورة (أو تنقطع الإذاعة) يرجع للإذاعة تلقائيًا
-  const rr = D.RECITERS[s.radioKey];
-  if (s.mode === 'radio' && rr && !rr.radio) s.radioSurah = ((s.radioSurah || 1) % 114) + 1;
+  if (s.mode === 'radio' && s.surahMode) s.radioSurah = ((s.radioSurah || 1) % 114) + 1;
   const quick = Date.now() - (s.startedAt || 0) < 15000;
   if (quick) console.log('⚠️ التشغيل وقف بسرعة، نعيد المحاولة بعد 15 ثانية');
   setTimeout(() => {
     startRadio(guild, ch, s.mode === 'radio' ? s.radioKey : (s.radioKey || DEFAULT_RADIO))
-      .catch((e) => console.error('⚠️ فشل تشغيل الإذاعة:', e.message));
+      .catch((e) => { console.error('⚠️ فشل تشغيل الإذاعة، نعيد المحاولة بعد دقيقة:', e.message); setTimeout(() => autoJoin(guild), 60000); });
   }, quick ? 15000 : 1000);
 }
 
@@ -140,7 +152,7 @@ async function autoJoin(guild) {
   const ch = quranChannel(guild);
   if (!ch) return;
   try { await startRadio(guild, ch, voice.get(guild.id)?.radioKey || DEFAULT_RADIO); console.log(`📻 الإذاعة شغالة في ${ch.name}`); }
-  catch (e) { console.error('⚠️ ما قدرت أدخل روم القرآن:', e.message); }
+  catch (e) { console.error('⚠️ ما قدرت أدخل روم القرآن، نعيد المحاولة بعد دقيقة:', e.message); setTimeout(() => autoJoin(guild), 60000); }
 }
 
 // ───────── مواقيت الصلاة ─────────
