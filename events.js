@@ -401,7 +401,7 @@ const commands = [
   new SlashCommandBuilder().setName('المتصدرين').setDescription('لوحة الصدارة: المستويات ونقاط التحديات 🏆'),
   new SlashCommandBuilder().setName('يومي').setDescription('مكافأتك اليومية من XP 🎁 (كل يوم تزيد مع الاستمرار)'),
   new SlashCommandBuilder().setName('اعتراف').setDescription('اكتب اعتراف بدون اسمك 🤫'),
-  new SlashCommandBuilder().setName('تحدي').setDescription('ينزّل تحدي جديد الحين (للإدارة) 🎯')
+  new SlashCommandBuilder().setName('تحدي-جديد').setDescription('ينزّل تحدي جديد الحين في روم التحديات (للإدارة) 🎯')
     .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages),
 ].map((c) => c.toJSON());
 
@@ -462,7 +462,7 @@ async function handle(i) {
       await i.showModal(modal);
       return true;
     }
-    if (i.commandName === 'تحدي') {
+    if (i.commandName === 'تحدي-جديد') {
       await i.reply({ content: '🎯 نزّلت تحدي جديد!', flags: MessageFlags.Ephemeral });
       await postChallenge(g);
       return true;
