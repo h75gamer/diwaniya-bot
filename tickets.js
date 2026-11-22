@@ -218,7 +218,7 @@ async function closeTicket(i) {
     await log.send({
       embeds: [new EmbedBuilder().setColor(0x99aab5).setTitle(`${t.emoji} انقفلت تذكرة ${t.label}`)
         .setDescription(`صاحب التذكرة: <@${uid}>\nقفلها: <@${i.user.id}>\nالروم: \`${ch.name}\``).setTimestamp()],
-      files: [new AttachmentBuilder(Buffer.from(text || '(فاضية)', 'utf8'), { name: `${ch.name}.txt` })],
+      files: [new AttachmentBuilder(Buffer.from('\ufeff' + (text || '(فاضية)'), 'utf8'), { name: `${ch.name}.txt` })],
       allowedMentions: { parse: [] },
     });
   } catch (e) { console.error('⚠️ ticket log:', e.message); }
