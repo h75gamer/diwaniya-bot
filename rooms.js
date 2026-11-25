@@ -286,11 +286,18 @@ const phone = {
   },
 };
 
+function isImage(buf, kind) {
+  if (kind === 'png') return buf.length > 8 && buf.readUInt32BE(0) === 0x89504e47;
+  if (kind === 'jpeg') return buf.length > 3 && buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff;
+  if (kind === 'webp') return buf.length > 12 && buf.toString('ascii', 0, 4) === 'RIFF' && buf.toString('ascii', 8, 12) === 'WEBP';
+  return false;
+}
 function saveImg(room, data) {
   const m = /^data:image\/(png|jpeg|webp);base64,([A-Za-z0-9+/=]+)$/.exec(String(data || ''));
   if (!m) return null;
   const buf = Buffer.from(m[2], 'base64');
   if (buf.length < 200 || buf.length > 700000) return null;
+  if (!isImage(buf, m[1])) return null;
   if (room.imgs.size > 400) return null;
   const id = rid(10);
   room.imgs.set(id, { buf, mime: `image/${m[1]}` });
@@ -688,6 +695,20 @@ function readBody(req, limit) {
   });
 }
 const actRate = new Map();
+// 🔒 حد الدخول لكل IP (ضد إغراق الغرفة بلاعبين وهميين)
+const joinRate = new Map();
+const MAX_ROOM_PLAYERS = 150;
+function ipOf(req) {
+  const h = req.headers;
+  return String(h['cf-connecting-ip'] || h['true-client-ip'] || String(h['x-forwarded-for'] || '').split(',').pop() || req.socket.remoteAddress || '').trim().slice(0, 64);
+}
+function joinOk(ip) {
+  const now = Date.now();
+  const arr = (joinRate.get(ip) || []).filter((t) => now - t < 60000);
+  if (arr.length >= 8) { joinRate.set(ip, arr); return false; }
+  arr.push(now); joinRate.set(ip, arr);
+  return true;
+}
 function rateOk(pid, max = 25) {
   const now = Date.now();
   const r = actRate.get(pid) || { t: now, n: 0 };
@@ -722,6 +743,8 @@ async function handle(req, res, url) {
     player.seen = Date.now();
     if (wasAway) bump(room);
     const since = Number(url.searchParams.get('since')) || 0;
+    // 🔒 اتصال انتظار واحد بس لكل لاعب
+    for (const old of [...room.waiters]) if (old.pid === player.pid) respond(room, old);
     const w = { pid: player.pid, since, res };
     if (room.seq > since) { room.waiters.add(w); respond(room, w); return true; }
     w.timer = setTimeout(() => respond(room, w), 20000);
@@ -746,6 +769,8 @@ async function handle(req, res, url) {
       if (same) { same.seen = Date.now(); if (tok.host) same.host = true; bump(room); sendJson(res, 200, { pid: same.pid }); return true; }
     }
     if (room.phase === 'end') { sendJson(res, 410, { error: 'الفعالية خلصت 🏁' }); return true; }
+    if (!joinOk(ipOf(req))) { sendJson(res, 429, { error: 'دخلت كثير بسرعة، استنى دقيقة ⏳' }); return true; }
+    if (room.players.size >= MAX_ROOM_PLAYERS) { sendJson(res, 403, { error: 'الغرفة فُلّت 😅' }); return true; }
     let name = tok && tok.code === room.code ? tok.name : cleanName(b.name);
     const taken = new Set([...room.players.values()].map((x) => x.name));
     if (taken.has(name)) { let k = 2; while (taken.has(`${name} ${k}`)) k++; name = `${name} ${k}`; }
@@ -799,6 +824,7 @@ setInterval(() => {
     }
   }
   for (const [k, r] of actRate) if (now - r.t > 60000) actRate.delete(k);
+  for (const [k, v] of joinRate) if (!v.some((t) => now - t < 60000)) joinRate.delete(k);
 }, 10000).unref();
 
 module.exports = { TYPES, DUR, create, tokenFor, get, current, summary, start, finish, cancel, handle, rooms };
