@@ -458,7 +458,15 @@ async function handle(i) {
 }
 
 // إعلان المميزات الجديدة + رابط الموقع (مرة وحدة)
-async function announce(g) {
+async function sendFix(g, ch, payload) {
+  try { return await ch.send(payload); } catch (e) {
+    if (e.code !== 50013) throw e;
+    // ما عنده صلاحية إرسال في هالروم — يعطي نفسه الصلاحية ويعيد
+    await ch.permissionOverwrites.edit(g.members.me.roles.highest, { ViewChannel: true, SendMessages: true, EmbedLinks: true });
+    return ch.send(payload);
+  }
+}
+async function announce(g, generalToo = true) {
   const site = (process.env.SITE_URL || process.env.RENDER_EXTERNAL_URL || 'https://diwaniya-bot-1.onrender.com').replace(/\/$/, '');
   const e = new EmbedBuilder().setColor(0xf5b942).setTitle('🎉 تحديث كبير في الديوانية!')
     .setDescription([
@@ -474,12 +482,12 @@ async function announce(g) {
   const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setURL(site).setLabel('افتح الموقع').setEmoji('🌐').setStyle(ButtonStyle.Link));
   const ann = g.channels.cache.find((c) => (c.type === ChannelType.GuildAnnouncement || c.type === ChannelType.GuildText) && /الإعلانات|الاعلانات/.test(c.name));
   const general = g.channels.cache.find((c) => c.type === ChannelType.GuildText && /عام/.test(c.name) && !/bot-/.test(c.name));
-  if (ann) await ann.send({ embeds: [e], components: [row] }).catch((er) => console.error('⚠️ announce:', er.message));
-  if (general) {
+  if (ann) await sendFix(g, ann, { embeds: [e], components: [row] }).then(() => console.log('📣 نزل إعلان التحديث')).catch((er) => console.error('⚠️ announce:', er.message));
+  if (general && generalToo) {
     const m = await general.send({ embeds: [new EmbedBuilder().setColor(0xf5b942).setTitle('🌐 موقع الديوانية').setDescription(`${site}\nألعاب، رسم، تحديات وفعاليات مباشرة — بدون تسجيل 🎮`)], components: [row] }).catch(() => null);
     if (m) await m.pin().catch(() => {});
   }
-  data.announced = true; dirty = true;
+  data.announced = true; data.announcedV = 2; dirty = true;
   await save(true);
 }
 
@@ -508,7 +516,7 @@ function init(c) {
           await ensureSetup(g, { gate: true });
           askExisting(g).catch((e) => console.error('⚠️ askExisting:', e.message));
         } else await ensureSetup(g, { gate: !data.gateOff }); // يتأكد إن الرتب والرومات موجودة ويقفل أي روم جديدة
-        if (!data.announced) await announce(g);
+        if (data.announcedV !== 2) await announce(g, !data.announced);
       } catch (e) { console.error('⚠️ gender setup:', e); }
     }, 15000);
     setInterval(() => checkWarns().then(() => save()).catch((e) => console.error('⚠️ warns:', e.message)), 10 * 60000);
