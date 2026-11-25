@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ديوانية 🌙 | Diwaniya — مجتمع وفعاليات</title>
+<meta name="description" content="ديوانية: مجتمع عربي على ديسكورد للسوالف والألعاب والقرآن. العب مئات الفعاليات بدون تسجيل: رسم، مسابقات، ألغاز، وأكثر.">
+<meta property="og:title" content="ديوانية 🌙 | Diwaniya">
+<meta property="og:description" content="مجتمع عربي للسوالف والألعاب — وفعاليات بدون تسجيل دخول">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d0a1f; --bg2:#151033; --card:#1c1640; --card2:#241d52; --line:#2f2768;
+  --gold:#f5b942; --gold2:#ffd77a; --text:#f3efff; --muted:#a99fd6; --good:#3ddc97; --bad:#ff5d73; --violet:#8b6cff;
+  --r:18px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Tajawal',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;z-index:-1;background:
+  radial-gradient(ellipse at 80% -10%,#3a2a8a55,transparent 55%),
+  radial-gradient(ellipse at 10% 110%,#f5b94222,transparent 50%),var(--bg)}
+.stars{position:fixed;inset:0;z-index:-1;pointer-events:none}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:0}
+input,textarea{font-family:inherit}
+.wrap{max-width:1180px;margin:auto;padding:0 20px}
+
+/* شريط علوي */
+nav{position:sticky;top:0;z-index:50;background:#0d0a1fcc;backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;align-items:center;gap:18px;height:64px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:20px}
+.brand img{width:38px;height:38px;border-radius:12px}
+.brand .moon{font-size:26px}
+nav .links{display:flex;gap:4px;margin-inline-start:auto}
+nav .links a{padding:8px 12px;border-radius:10px;color:var(--muted);font-weight:700;font-size:15px}
+nav .links a:hover{color:var(--text);background:var(--card)}
+.nick{display:flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px 10px}
+.nick input{background:none;border:0;color:var(--text);width:110px;outline:none;font-size:14px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 22px;border-radius:14px;font-weight:800;font-size:16px;transition:.15s}
+.btn.gold{background:linear-gradient(135deg,var(--gold),#e89b1c);color:#1b1300;box-shadow:0 8px 24px #f5b94244}
+.btn.gold:hover{transform:translateY(-2px);box-shadow:0 12px 30px #f5b94266}
+.btn.ghost{background:var(--card);color:var(--text);border:1px solid var(--line)}
+.btn.ghost:hover{background:var(--card2)}
+.btn.sm{padding:8px 14px;font-size:14px;border-radius:11px}
+
+/* الواجهة */
+.hero{padding:70px 0 40px;text-align:center}
+.hero .logo{width:120px;height:120px;border-radius:32px;margin:auto;display:grid;place-items:center;font-size:70px;background:linear-gradient(145deg,#2b2170,#151033);border:1px solid var(--line);box-shadow:0 20px 60px #8b6cff33;overflow:hidden}
+.hero .logo img{width:100%;height:100%;object-fit:cover}
+.hero h1{font-size:clamp(34px,6vw,60px);font-weight:900;margin-top:18px;line-height:1.2}
+.hero h1 span{background:linear-gradient(90deg,var(--gold2),var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p.sub{color:var(--muted);font-size:clamp(17px,2.2vw,21px);max-width:680px;margin:14px auto 26px}
+.hero .cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.stats{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:34px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 22px;min-width:130px}
+.stat b{display:block;font-size:26px;font-weight:900;color:var(--gold2)}
+.stat small{color:var(--muted);font-size:14px}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--good);margin-inline-end:6px;box-shadow:0 0 10px var(--good)}
+
+section{padding:46px 0}
+.sec-h{display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:22px;flex-wrap:wrap}
+.sec-h h2{font-size:30px;font-weight:900}
+.sec-h p{color:var(--muted)}
+.features{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.feat{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px}
+.feat .ic{font-size:32px}
+.feat h3{font-size:19px;margin:6px 0 4px}
+.feat p{color:var(--muted);font-size:15px}
+
+/* الفعاليات */
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.chip{padding:7px 14px;border-radius:999px;background:var(--card);border:1px solid var(--line);color:var(--muted);font-weight:700;font-size:14px}
+.chip.on{background:var(--gold);color:#1b1300;border-color:var(--gold)}
+.games{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
+.game{position:relative;background:linear-gradient(160deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:var(--r);padding:18px;text-align:right;color:var(--text);transition:.15s;min-height:150px;display:flex;flex-direction:column;gap:6px}
+.game:hover{transform:translateY(-4px);border-color:var(--gold);box-shadow:0 14px 34px #0008}
+.game .ic{font-size:38px;line-height:1}
+.game h3{font-size:18px;font-weight:800}
+.game p{color:var(--muted);font-size:14px;flex:1}
+.game .count{font-size:12px;color:var(--gold2);font-weight:700}
+.game .tag{position:absolute;top:12px;left:12px;font-size:11px;background:#ffffff14;padding:2px 8px;border-radius:99px;color:var(--muted)}
+
+/* نافذة اللعب */
+.modal{position:fixed;inset:0;z-index:100;background:#05030ecc;backdrop-filter:blur(6px);display:none;align-items:flex-start;justify-content:center;padding:24px 12px;overflow:auto}
+.modal.open{display:flex}
+.panel{width:min(860px,100%);background:var(--bg2);border:1px solid var(--line);border-radius:24px;box-shadow:0 30px 80px #000a;overflow:hidden;margin:auto}
+.panel-h{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line);background:var(--card)}
+.panel-h h3{font-size:20px;font-weight:900;flex:1}
+.x{background:var(--card2);color:var(--text);width:36px;height:36px;border-radius:10px;font-size:18px}
+.panel-b{padding:22px}
+.hud{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.pill{background:var(--card);border:1px solid var(--line);padding:6px 14px;border-radius:999px;font-weight:700;font-size:14px}
+.pill b{color:var(--gold2)}
+.q{font-size:clamp(20px,3vw,26px);font-weight:800;text-align:center;margin:8px 0 18px}
+.big{font-size:clamp(40px,8vw,64px);text-align:center;margin:10px 0;letter-spacing:4px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.opt{background:var(--card);border:2px solid var(--line);color:var(--text);padding:14px;border-radius:14px;font-size:17px;font-weight:700;transition:.1s}
+.opt:hover{border-color:var(--violet)}
+.opt.ok{background:#3ddc9722;border-color:var(--good)}
+.opt.no{background:#ff5d7322;border-color:var(--bad)}
+.row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;align-items:center}
+.inp{flex:1;min-width:200px;background:var(--card);border:2px solid var(--line);color:var(--text);padding:13px 16px;border-radius:14px;font-size:18px;outline:none}
+.inp:focus{border-color:var(--gold)}
+.msg{text-align:center;min-height:30px;font-weight:800;margin-top:12px;font-size:18px}
+.msg.ok{color:var(--good)} .msg.no{color:var(--bad)}
+.bar{height:8px;background:var(--card);border-radius:99px;overflow:hidden;margin-bottom:16px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--violet));transition:width .25s linear}
+.end{text-align:center;padding:10px 0}
+.end .score{font-size:56px;font-weight:900;color:var(--gold2)}
+.end p{color:var(--muted);margin-bottom:16px}
+.hint{color:var(--muted);text-align:center;font-size:14px;margin-top:10px}
+
+/* لو خيروك */
+.wyr{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.wyr button{position:relative;overflow:hidden;background:var(--card);border:2px solid var(--line);color:var(--text);border-radius:18px;padding:26px 14px;font-size:19px;font-weight:800;min-height:130px}
+.wyr button .fill{position:absolute;inset:auto 0 0 0;background:#8b6cff44;height:0;transition:height .5s}
+.wyr button span{position:relative}
+.wyr button .pct{display:block;font-size:28px;color:var(--gold2);margin-top:6px}
+
+/* الذاكرة */
+.mem{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:440px;margin:auto}
+.card{aspect-ratio:1;border-radius:14px;background:linear-gradient(145deg,var(--card2),var(--card));border:2px solid var(--line);font-size:34px;display:grid;place-items:center;color:transparent;transition:.2s}
+.card.up{color:inherit;background:var(--card);border-color:var(--violet)}
+.card.done{color:inherit;border-color:var(--good);opacity:.7}
+
+/* إكس أو */
+.xo{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:330px;margin:auto}
+.xo button{aspect-ratio:1;background:var(--card);border:2px solid var(--line);border-radius:16px;font-size:48px;font-weight:900;color:var(--text)}
+.xo button.x1{color:var(--gold2)} .xo button.o1{color:var(--violet)}
+
+/* رد الفعل */
+.react{height:260px;border-radius:20px;display:grid;place-items:center;font-size:26px;font-weight:900;user-select:none;cursor:pointer;background:var(--card);border:2px solid var(--line)}
+.react.wait{background:#5b1b2b;border-color:var(--bad)}
+.react.go{background:#14533d;border-color:var(--good)}
+
+/* المرسم */
+.studio{display:grid;grid-template-columns:1fr;gap:12px}
+.tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center}
+.sw{width:30px;height:30px;border-radius:50%;border:3px solid transparent;box-shadow:0 0 0 1px #0006 inset}
+.sw.on{border-color:#fff}
+.tool{background:var(--card);border:1px solid var(--line);color:var(--text);padding:7px 12px;border-radius:10px;font-weight:700;font-size:14px}
+.tool.on{background:var(--gold);color:#1b1300}
+canvas#cv{width:100%;aspect-ratio:4/3;background:#fff;border-radius:16px;touch-action:none;cursor:crosshair;display:block}
+.prompt{text-align:center;font-size:20px;font-weight:800}
+.prompt b{color:var(--gold2)}
+
+/* المعرض واللوحات */
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.gi{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.gi img{width:100%;aspect-ratio:4/3;object-fit:cover;background:#fff;display:block}
+.gi div{padding:8px 12px;font-size:14px}
+.gi b{display:block}
+.gi small{color:var(--muted)}
+.empty{color:var(--muted);text-align:center;padding:30px;border:1px dashed var(--line);border-radius:16px}
+.boards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.board{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.board h4{font-size:17px;margin-bottom:8px}
+.board ol{list-style:none}
+.board li{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dashed var(--line);font-size:15px}
+.board li:last-child{border:0}
+.board li span:last-child{color:var(--gold2);font-weight:800}
+
+/* تسبيح */
+.tasbih{display:grid;place-items:center;gap:14px}
+.bead{width:200px;height:200px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#3c2f8f,#191247);border:3px solid var(--gold);color:var(--gold2);font-size:64px;font-weight:900;box-shadow:0 18px 50px #f5b94233}
+.bead:active{transform:scale(.96)}
+
+footer{border-top:1px solid var(--line);padding:30px 0;color:var(--muted);text-align:center;margin-top:30px}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(120px);background:var(--card2);border:1px solid var(--gold);padding:12px 20px;border-radius:14px;font-weight:800;z-index:200;transition:.3s;max-width:90vw}
+.toast.show{transform:translateX(-50%) translateY(0)}
+@media(max-width:760px){nav .links{display:none}.opts,.wyr{grid-template-columns:1fr}.hero{padding-top:40px}}
+</style>
+</head>
+<body>
+<canvas class="stars" id="stars"></canvas>
+
+<nav><div class="wrap">
+  <a class="brand" href="#top"><span id="navIcon" class="moon">🌙</span>ديوانية</a>
+  <div class="links">
+    <a href="#about">عن السيرفر</a><a href="#events">الفعاليات</a><a href="#gallery">المعرض</a><a href="#boards">المتصدرين</a>
+  </div>
+  <label class="nick" title="اسمك يظهر في لوحات المتصدرين والمعرض">✏️<input id="nick" maxlength="20" placeholder="اكتب اسمك"></label>
+</div></nav>
+
+<header class="hero wrap" id="top">
+  <div class="logo" id="logo">🌙</div>
+  <h1>هلا بك في <span>ديوانية</span></h1>
+  <p class="sub">مجتمع عربي على ديسكورد للسوالف والألعاب والراحة 🌙 — قرآن 24 ساعة، ذكاء اصطناعي يسولف بلهجتنا، تحديات يومية، والحين: <b>مئات الفعاليات هنا بدون أي تسجيل!</b></p>
+  <div class="cta">
+    <a class="btn gold" id="joinBtn" href="https://discord.gg/Jd7PhFDARx" target="_blank" rel="noopener">🚀 ادخل السيرفر</a>
+    <a class="btn ghost" href="#events">🎮 العب الحين</a>
+  </div>
+  <div class="stats">
+    <div class="stat"><b id="sMembers">—</b><small>👥 عضو</small></div>
+    <div class="stat"><b id="sOnline">—</b><small><span class="dot"></span>متصل الحين</small></div>
+    <div class="stat"><b id="sItems">—</b><small>🎯 فعالية وسؤال</small></div>
+    <div class="stat"><b id="sPlays">—</b><small>🏆 نتيجة مسجلة</small></div>
+  </div>
+</header>
+
+<section id="about"><div class="wrap">
+  <div class="sec-h"><div><h2>وش في الديوانية؟ 🏠</h2><p>كل شيء تحتاجه لسهرة حلوة مع ناس طيبين</p></div></div>
+  <div class="features">
+    <div class="feat"><div class="ic">📖</div><h3>قرآن 24 ساعة</h3><p>روم صوتي فيه إذاعة قرآن ما توقف، وتقدر تختار من 12 قارئ.</p></div>
+    <div class="feat"><div class="ic">🤖</div><h3>ذكاء يسولف بلهجتنا</h3><p>بوت ذكاء اصطناعي يعرف السيرفر ويسولف معك بالسعودي.</p></div>
+    <div class="feat"><div class="ic">🎯</div><h3>تحديات يومية</h3><p>4 تحديات كل يوم بنقاط، وكل جمعة يتتوّج بطل الأسبوع 👑</p></div>
+    <div class="feat"><div class="ic">🆙</div><h3>مستويات ورتب</h3><p>كل ما تتفاعل تطلع مستوى وتاخذ رتب، ومكافأة يومية 🎁</p></div>
+    <div class="feat"><div class="ic">🎮</div><h3>سهرة ألعاب</h3><p>سهرة أسبوعية كل خميس، وروم تلقى فيه تيم تلعب معه.</p></div>
+    <div class="feat"><div class="ic">🤍</div><h3>للجميع</h3><p>مكان محترم بدون تفرقة ولا طائفية، وإدارة متواجدة ونظام تذاكر.</p></div>
+  </div>
+</div></section>
+
+<section id="events"><div class="wrap">
+  <div class="sec-h"><div><h2>الفعاليات 🎉</h2><p>العب على طول — بدون حساب ولا تسجيل. اكتب اسمك فوق عشان يطلع في المتصدرين.</p></div>
+    <button class="btn gold sm" id="randomBtn">🎲 فعالية عشوائية</button></div>
+  <div class="filters" id="filters"></div>
+  <div class="games" id="games"></div>
+</div></section>
+
+<section id="gallery"><div class="wrap">
+  <div class="sec-h"><div><h2>معرض الرسومات 🖼️</h2><p>رسومات الزوار من «مرسم الديوانية» — وتنزل كمان في روم المعرض بالسيرفر</p></div>
+    <button class="btn ghost sm" onclick="openGame('draw')">🎨 ارسم وشارك</button></div>
+  <div class="gal" id="gal"><div class="empty">جاري التحميل...</div></div>
+</div></section>
+
+<section id="boards"><div class="wrap">
+  <div class="sec-h"><div><h2>المتصدرين 🏆</h2><p>أعلى النتائج في كل لعبة</p></div></div>
+  <div class="boards" id="boardsBox"></div>
+</div></section>
+
+<footer><div class="wrap">
+  صُنع بحب لمجتمع <b>ديوانية 🌙</b> — <a href="https://discord.gg/Jd7PhFDARx" id="joinFoot" target="_blank" rel="noopener" style="color:var(--gold2)">انضم لنا في ديسكورد</a>
+</div></footer>
+
+<div class="modal" id="modal"><div class="panel">
+  <div class="panel-h"><span id="mIcon" style="font-size:26px"></span><h3 id="mTitle"></h3><button class="x" onclick="closeGame()">✕</button></div>
+  <div class="panel-b" id="stage"></div>
+</div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+// ───── أدوات عامة ─────
+const $ = (s, el = document) => el.querySelector(s);
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const rnd = (n) => Math.floor(Math.random() * n);
+const pick = (a) => a[rnd(a.length)];
+const shuffle = (a) => { const b = [...a]; for (let i = b.length - 1; i > 0; i--) { const j = rnd(i + 1); [b[i], b[j]] = [b[j], b[i]]; } return b; };
+const store = { get(k, d) { try { const v = localStorage.getItem('dw_' + k); return v === null ? d : JSON.parse(v); } catch { return d; } }, set(k, v) { try { localStorage.setItem('dw_' + k, JSON.stringify(v)); } catch {} } };
+function toast(t) { const el = $('#toast'); el.textContent = t; el.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('show'), 2600); }
+function digits(s) { return String(s).replace(/[\u0660-\u0669]/g, (d) => d.charCodeAt(0) - 0x660).replace(/[\u06f0-\u06f9]/g, (d) => d.charCodeAt(0) - 0x6f0); }
+function norm(s) {
+  return digits(s || '').normalize('NFKC').replace(/[\u064b-\u065f\u0670\u0640]/g, '').replace(/[\u0622\u0623\u0625\u0671]/g, '\u0627')
+    .replace(/ة/g, 'ه').replace(/ى/g, '\u064a').replace(/[^\p{L}\p{N}\s]/gu, ' ').replace(/\s+/g, ' ').trim().toLowerCase();
+}
+const noAl = (s) => s.split(' ').map((w) => (w.startsWith('\u0627\u0644') && w.length > 3 ? w.slice(2) : w)).join(' ');
+function matches(input, answers) { const a = norm(input); if (!a) return false; return answers.some((x) => { const b = norm(x); return a === b || noAl(a) === noAl(b) || (b.length > 3 && noAl(a).includes(noAl(b))); }); }
+const nick = () => (store.get('nick', '') || '').trim() || 'زائر';
+async function api(path, body) {
+  const r = await fetch(path, body ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : {});
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.error || 'خطأ');
+  return j;
+}
+
+// ───── البيانات ─────
+let C = null;
+const DATA_FALLBACK = { trivia: [], emoji: [], words: [], sentences: [], wyr: [], tf: [], riddles: [], proverbs: [], draw: ['رسمة حرّة'] };
+
+// ───── قائمة الفعاليات ─────
+const GAMES = [
+  { id: 'draw', ic: '🎨', t: 'مرسم الديوانية', d: 'ارسم فكرة عشوائية وشارك رسمتك في المعرض وفي السيرفر', cat: 'إبداع', n: () => C.draw.length + ' فكرة رسم' },
+  { id: 'quiz', ic: '🧠', t: 'المسابقة الثقافية', d: '10 أسئلة بوقت — كل ما جاوبت أسرع زادت نقاطك', cat: 'معلومات', n: () => C.trivia.length + ' سؤال' },
+  { id: 'tf', ic: '✅', t: 'صح ولا خطأ', d: 'دقيقة وحدة: جاوب أكثر عدد ممكن', cat: 'معلومات', n: () => C.tf.length + ' معلومة' },
+  { id: 'emoji', ic: '🤔', t: 'خمّن الإيموجي', d: 'وش المقصود من الإيموجيات؟ اكتب جوابك', cat: 'ألغاز', n: () => C.emoji.length + ' تحدي' },
+  { id: 'scramble', ic: '🔤', t: 'رتّب الحروف', d: 'حروف متلخبطة، طلّع الكلمة الصح', cat: 'ألغاز', n: () => C.words.length + ' كلمة' },
+  { id: 'riddle', ic: '🧩', t: 'الألغاز', d: 'ألغاز تشغّل المخ 🤯', cat: 'ألغاز', n: () => C.riddles.length + ' لغز' },
+  { id: 'proverb', ic: '📜', t: 'كمّل المثل', d: 'أمثال شعبية وعربية، كمّلها صح', cat: 'ألغاز', n: () => C.proverbs.length + ' مثل' },
+  { id: 'typing', ic: '⌨️', t: 'أسرع كاتب', d: 'كم كلمة تكتب بالدقيقة؟ (ممنوع النسخ 😏)', cat: 'سرعة', n: () => C.sentences.length + ' جملة' },
+  { id: 'math', ic: '🧮', t: 'رياضيات سريعة', d: '60 ثانية من الحساب الذهني', cat: 'سرعة', n: () => '∞ مسألة' },
+  { id: 'reaction', ic: '⚡', t: 'سرعة رد الفعل', d: 'اضغط أول ما يصير أخضر!', cat: 'سرعة', n: () => '5 محاولات' },
+  { id: 'memory', ic: '🃏', t: 'لعبة الذاكرة', d: 'طابق الأزواج بأقل حركات', cat: 'ألعاب', n: () => '8 أزواج' },
+  { id: 'xo', ic: '⭕', t: 'إكس أو', d: 'تحدّى بوت الديوانية', cat: 'ألعاب', n: () => '3 مستويات' },
+  { id: 'wyr', ic: '🤷', t: 'لو خيروك', d: 'اختر وشوف وش اختاروا الناس', cat: 'سوالف', n: () => C.wyr.length + ' سؤال' },
+  { id: 'tasbih', ic: '📿', t: 'المسبحة', d: 'سبّح واحفظ عدّك', cat: 'روحانيات', n: () => 'عدّاد' },
+];
+const CATS = ['الكل', ...new Set(GAMES.map((g) => g.cat))];
+let curCat = 'الكل';
+function renderGames() {
+  $('#filters').innerHTML = CATS.map((c) => `<button class="chip ${c === curCat ? 'on' : ''}" data-c="${c}">${c}</button>`).join('');
+  $('#games').innerHTML = GAMES.filter((g) => curCat === 'الكل' || g.cat === curCat).map((g) => `
+    <button class="game" data-g="${g.id}"><span class="tag">${g.cat}</span><span class="ic">${g.ic}</span><h3>${g.t}</h3><p>${g.d}</p><span class="count">${C ? g.n() : ''}</span></button>`).join('');
+}
+$('#filters').addEventListener('click', (e) => { const c = e.target.closest('.chip'); if (c) { curCat = c.dataset.c; renderGames(); } });
+$('#games').addEventListener('click', (e) => { const g = e.target.closest('.game'); if (g) openGame(g.dataset.g); });
+$('#randomBtn').onclick = () => openGame(pick(GAMES).id);
+
+// ───── النافذة ─────
+let cleanup = null;
+function openGame(id) {
+  if (!C) return toast('لحظة، الفعاليات قاعدة تتحمل ⏳');
+  const g = GAMES.find((x) => x.id === id);
+  $('#mIcon').textContent = g.ic; $('#mTitle').textContent = g.t;
+  $('#modal').classList.add('open'); document.body.style.overflow = 'hidden';
+  if (cleanup) cleanup(); cleanup = null;
+  ({ draw, quiz, tf, emoji, scramble, riddle, proverb, typing, math, reaction, memory, xo, wyr, tasbih })[id]($('#stage'));
+}
+function closeGame() { if (cleanup) cleanup(); cleanup = null; $('#modal').classList.remove('open'); document.body.style.overflow = ''; $('#stage').innerHTML = ''; }
+$('#modal').addEventListener('click', (e) => { if (e.target.id === 'modal') closeGame(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeGame(); });
+
+// ───── نهاية اللعبة + المتصدرين ─────
+function endScreen(el, game, score, line, again) {
+  const best = store.get('best_' + game, 0);
+  const isBest = score > best;
+  if (isBest) store.set('best_' + game, score);
+  el.innerHTML = `<div class="end"><div style="font-size:50px">${score > 0 ? '🎉' : '😅'}</div><div class="score">${score}</div>
+    <p>${esc(line)}${isBest && score > 0 ? '<br>🔥 رقم قياسي جديد لك!' : `<br>أفضل نتيجة لك: ${best}`}</p>
+    <div class="row"><button class="btn gold" id="again">🔁 مرة ثانية</button><button class="btn ghost" id="other">🎲 لعبة ثانية</button></div>
+    <p class="hint" id="rankMsg">${score > 0 ? 'جاري تسجيل نتيجتك باسم «' + esc(nick()) + '»...' : ''}</p></div>`;
+  $('#again').onclick = again;
+  $('#other').onclick = () => openGame(pick(GAMES.filter((x) => x.id !== game && x.id !== 'tasbih')).id);
+  if (score > 0) {
+    api('/api/score', { game, name: nick(), score }).then((r) => {
+      const m = $('#rankMsg'); if (m) m.textContent = `✅ انسجلت! ترتيبك في «المتصدرين»: #${r.rank}${nick() === 'زائر' ? ' — اكتب اسمك فوق عشان يطلع باسمك' : ''}`;
+      loadBoards();
+    }).catch((e) => { const m = $('#rankMsg'); if (m) m.textContent = '⚠️ ' + e.message; });
+  }
+}
+function timerBar(el, secs, onEnd) {
+  const bar = $('.bar i', el); let left = secs * 10;
+  const t = setInterval(() => { left--; if (bar) bar.style.width = (left / (secs * 10)) * 100 + '%'; const s = $('#secs', el); if (s) s.textContent = Math.ceil(left / 10); if (left <= 0) { clearInterval(t); onEnd(); } }, 100);
+  return () => clearInterval(t);
+}
+
+// ───── 🧠 المسابقة ─────
+function quiz(el) {
+  const qs = shuffle(C.trivia).slice(0, 10); let i = 0, score = 0, right = 0, stop = null;
+  const next = () => {
+    if (stop) stop();
+    if (i >= qs.length) return endScreen(el, 'quiz', score, `جاوبت ${right} من 10 صح`, () => quiz(el));
+    const [q, opts, ok] = qs[i]; const order = shuffle([0, 1, 2, 3]); let t0 = Date.now(), done = false;
+    el.innerHTML = `<div class="hud"><span class="pill">سؤال <b>${i + 1}/10</b></span><span class="pill">النقاط <b>${score}</b></span><span class="pill">⏳ <b id="secs">15</b></span></div>
+      <div class="bar"><i style="width:100%"></i></div><div class="q">${esc(q)}</div>
+      <div class="opts">${order.map((k) => `<button class="opt" data-k="${k}">${esc(opts[k])}</button>`).join('')}</div><div class="msg" id="m"></div>`;
+    const finish = (k) => {
+      if (done) return; done = true; if (stop) stop();
+      el.querySelectorAll('.opt').forEach((b) => { if (+b.dataset.k === ok) b.classList.add('ok'); else if (+b.dataset.k === k) b.classList.add('no'); b.disabled = true; });
+      if (k === ok) { const pts = 100 + Math.max(0, Math.round((15000 - (Date.now() - t0)) / 150)); score += pts; right++; $('#m').className = 'msg ok'; $('#m').textContent = `✅ صح! +${pts}`; }
+      else { $('#m').className = 'msg no'; $('#m').textContent = k === -1 ? '⏰ انتهى الوقت!' : '❌ غلط!'; }
+      i++; setTimeout(next, 1100);
+    };
+    el.querySelector('.opts').onclick = (e) => { const b = e.target.closest('.opt'); if (b) finish(+b.dataset.k); };
+    stop = timerBar(el, 15, () => finish(-1));
+  };
+  next(); cleanup = () => stop && stop();
+}
+
+// ───── ✅ صح ولا خطأ ─────
+function tf(el) {
+  const list = shuffle(C.tf); let i = 0, score = 0, streak = 0;
+  el.innerHTML = `<div class="hud"><span class="pill">النقاط <b id="sc">0</b></span><span class="pill">🔥 <b id="st">0</b></span><span class="pill">⏳ <b id="secs">60</b></span></div>
+    <div class="bar"><i style="width:100%"></i></div><div class="q" id="qq"></div>
+    <div class="opts"><button class="opt" data-v="1">✅ صح</button><button class="opt" data-v="0">❌ خطأ</button></div><div class="msg" id="m"></div>`;
+  const show = () => { $('#qq').textContent = list[i % list.length][0]; };
+  show();
+  el.querySelector('.opts').onclick = (e) => {
+    const b = e.target.closest('.opt'); if (!b) return;
+    const ok = list[i % list.length][1] === (b.dataset.v === '1');
+    if (ok) { streak++; score += 10 + Math.min(streak, 10) * 2; $('#m').className = 'msg ok'; $('#m').textContent = '✅ صح'; }
+    else { streak = 0; $('#m').className = 'msg no'; $('#m').textContent = '❌ غلط'; }
+    $('#sc').textContent = score; $('#st').textContent = streak; i++; show();
+  };
+  const stop = timerBar(el, 60, () => endScreen(el, 'tf', score, `جاوبت ${i} سؤال في دقيقة`, () => tf(el)));
+  cleanup = stop;
+}
+
+// ───── أسئلة بالكتابة (إيموجي / حروف / ألغاز / أمثال) ─────
+function textRound(el, { game, items, show, answers, label, rounds = 8, secs = 40, hint }) {
+  const list = shuffle(items).slice(0, rounds); let i = 0, score = 0, right = 0, stop = null;
+  const next = () => {
+    if (stop) stop();
+    if (i >= list.length) return endScreen(el, game, score, `حليت ${right} من ${list.length}`, () => textRound(el, arguments[1]));
+    const it = list[i]; let done = false, t0 = Date.now(), hinted = false;
+    el.innerHTML = `<div class="hud"><span class="pill">${label} <b>${i + 1}/${list.length}</b></span><span class="pill">النقاط <b>${score}</b></span><span class="pill">⏳ <b id="secs">${secs}</b></span></div>
+      <div class="bar"><i style="width:100%"></i></div>${show(it)}
+      <div class="row"><input class="inp" id="ans" placeholder="اكتب جوابك هنا..." autocomplete="off"><button class="btn gold" id="go">تأكيد</button></div>
+      <div class="row" style="margin-top:10px">${hint ? '<button class="btn ghost sm" id="hint">💡 تلميح (-نص النقاط)</button>' : ''}<button class="btn ghost sm" id="skip">⏭️ تخطي</button></div>
+      <div class="msg" id="m"></div>`;
+    const inp = $('#ans'); inp.focus();
+    const finish = (win) => {
+      if (done) return; done = true; if (stop) stop();
+      if (win) { let pts = 100 + Math.max(0, Math.round((secs * 1000 - (Date.now() - t0)) / (secs * 10))); if (hinted) pts = Math.round(pts / 2); score += pts; right++; $('#m').className = 'msg ok'; $('#m').textContent = `✅ كفو! +${pts}`; }
+      else { $('#m').className = 'msg no'; $('#m').innerHTML = `الجواب: <b>${esc(answers(it)[0])}</b>`; }
+      i++; setTimeout(next, win ? 1000 : 1900);
+    };
+    const check = () => { if (matches(inp.value, answers(it))) finish(true); else { $('#m').className = 'msg no'; $('#m').textContent = '❌ مو هذا، جرّب مرة ثانية'; inp.select(); } };
+    $('#go').onclick = check; inp.onkeydown = (e) => { if (e.key === 'Enter') check(); };
+    $('#skip').onclick = () => finish(false);
+    if (hint) $('#hint').onclick = () => { hinted = true; $('#m').className = 'msg'; $('#m').textContent = '💡 ' + hint(it); };
+    stop = timerBar(el, secs, () => finish(false));
+  };
+  next(); cleanup = () => stop && stop();
+}
+function emoji(el) { textRound(el, { game: 'emoji', items: C.emoji, label: 'تحدي', show: (it) => `<div class="big">${it[0]}</div><p class="hint">وش المقصود؟</p>`, answers: (it) => it[1], hint: (it) => `أول حرف: «${[...it[1][0]][0]}» وعدد الحروف ${it[1][0].replace(/\s/g, '').length}` }); }
+function scramble(el) {
+  textRound(el, { game: 'scramble', items: C.words.map((w) => { let m = w; for (let k = 0; k < 10 && m === w; k++) m = shuffle([...w]).join(''); return [w, m]; }), label: 'كلمة',
+    show: (it) => `<div class="big">${[...it[1]].join(' ')}</div><p class="hint">رتّب الحروف وطلّع الكلمة</p>`, answers: (it) => [it[0]], hint: (it) => `تبدأ بـ «${[...it[0]][0]}» وتنتهي بـ «${[...it[0]].pop()}»`, secs: 35 });
+}
+function riddle(el) { textRound(el, { game: 'riddle', items: C.riddles, label: 'لغز', rounds: 6, secs: 60, show: (it) => `<div class="q">🧩 ${esc(it[0])}</div>`, answers: (it) => it[1], hint: (it) => `أول حرف: «${[...it[1][0].replace(/^ال/, '')][0]}»` }); }
+function proverb(el) { textRound(el, { game: 'proverb', items: C.proverbs, label: 'مثل', rounds: 8, secs: 40, show: (it) => `<div class="q">📜 ${esc(it[0])}</div><p class="hint">كمّل المثل</p>`, answers: (it) => it[1], hint: (it) => `أول كلمة: «${it[1][0].split(' ')[0]}»` }); }
+
+// ───── ⌨️ أسرع كاتب ─────
+function typing(el) {
+  const s = pick(C.sentences); let t0 = 0, done = false;
+  el.innerHTML = `<div class="hud"><span class="pill">⏱️ <b id="tm">0.0</b> ث</span></div>
+    <div class="q" style="user-select:none;-webkit-user-select:none" oncopy="return false">${esc(s)}</div>
+    <div class="row"><input class="inp" id="ans" placeholder="ابدأ الكتابة هنا..." autocomplete="off" onpaste="return false" ondrop="return false"></div>
+    <div class="msg" id="m"></div><p class="hint">اكتب الجملة بالضبط — الوقت يبدأ مع أول حرف</p>`;
+  const inp = $('#ans'); inp.focus(); let tick = null;
+  inp.oninput = () => {
+    if (!t0) { t0 = Date.now(); tick = setInterval(() => { const tm = $('#tm'); if (tm) tm.textContent = ((Date.now() - t0) / 1000).toFixed(1); }, 100); }
+    if (!done && norm(inp.value) === norm(s)) {
+      done = true; clearInterval(tick);
+      const secs = (Date.now() - t0) / 1000; const words = s.split(/\s+/).length; const wpm = Math.round(words / (secs / 60));
+      setTimeout(() => endScreen(el, 'typing', Math.min(wpm, 400), `كتبت ${words} كلمات في ${secs.toFixed(1)} ثانية — سرعتك ${wpm} كلمة بالدقيقة`, () => typing(el)), 300);
+    }
+  };
+  cleanup = () => clearInterval(tick);
+}
+
+// ───── 🧮 رياضيات ─────
+function math(el) {
+  let score = 0, solved = 0, cur;
+  const make = () => {
+    const lvl = Math.min(4, Math.floor(solved / 5)); const t = rnd(4);
+    let a = 2 + rnd(8 + lvl * 6), b = 2 + rnd(8 + lvl * 4);
+    if (t === 0) cur = [`${a} + ${b}`, a + b]; else if (t === 1) { if (b > a) [a, b] = [b, a]; cur = [`${a} − ${b}`, a - b]; }
+    else if (t === 2) cur = [`${a} × ${b}`, a * b]; else cur = [`${a * b} ÷ ${b}`, a];
+    $('#qq').textContent = cur[0] + ' = ؟'; $('#ans').value = ''; $('#ans').focus();
+  };
+  el.innerHTML = `<div class="hud"><span class="pill">النقاط <b id="sc">0</b></span><span class="pill">⏳ <b id="secs">60</b></span></div>
+    <div class="bar"><i style="width:100%"></i></div><div class="big" id="qq"></div>
+    <div class="row"><input class="inp" id="ans" inputmode="numeric" placeholder="الجواب" autocomplete="off"></div><div class="msg" id="m"></div>`;
+  make();
+  $('#ans').oninput = (e) => { if (Number(digits(e.target.value.trim())) === cur[1] && e.target.value.trim() !== '') { solved++; score += 10 + Math.min(solved, 20); $('#sc').textContent = score; $('#m').className = 'msg ok'; $('#m').textContent = '✅'; make(); } };
+  cleanup = timerBar(el, 60, () => endScreen(el, 'math', score, `حليت ${solved} مسألة في دقيقة`, () => math(el)));
+}
+
+// ───── ⚡ رد الفعل ─────
+function reaction(el) {
+  const times = []; let state = 'idle', t0 = 0, to = null;
+  el.innerHTML = `<div class="hud"><span class="pill">محاولة <b id="tr">1/5</b></span><span class="pill">آخر نتيجة <b id="last">—</b></span></div>
+    <div class="react" id="pad">اضغط عشان تبدأ</div><p class="hint">استنى لين يصير أخضر واضغط بأسرع ما يمكن</p>`;
+  const pad = $('#pad');
+  const arm = () => { state = 'wait'; pad.className = 'react wait'; pad.textContent = 'استنى... 🔴'; to = setTimeout(() => { state = 'go'; pad.className = 'react go'; pad.textContent = 'اضغط الحين! 🟢'; t0 = performance.now(); }, 1200 + rnd(2800)); };
+  pad.onpointerdown = () => {
+    if (state === 'idle' || state === 'result') return arm();
+    if (state === 'wait') { clearTimeout(to); state = 'result'; pad.className = 'react'; pad.textContent = '😅 بدري! اضغط وحاول مرة ثانية'; return; }
+    if (state === 'go') {
+      const ms = Math.round(performance.now() - t0); times.push(ms); $('#last').textContent = ms + 'ms';
+      if (times.length >= 5) { const avg = Math.round(times.reduce((a, b) => a + b) / times.length); return endScreen(el, 'reaction', Math.max(1, 1000 - avg), `متوسط سرعتك ${avg} ملي ثانية (النقاط = 1000 − المتوسط)`, () => reaction(el)); }
+      $('#tr').textContent = (times.length + 1) + '/5'; state = 'result'; pad.className = 'react'; pad.textContent = `${ms}ms — اضغط للمحاولة الجاية`;
+    }
+  };
+  cleanup = () => clearTimeout(to);
+}
+
+// ───── 🃏 الذاكرة ─────
+function memory(el) {
+  const pool = ['🌙', '⭐', '☕', '🐪', '🌴', '🎮', '🏆', '📿', '🦅', '🍉', '🚀', '🎨', '🦁', '🍕', '⚽', '🎁'];
+  const set = shuffle(pool).slice(0, 8); const cards = shuffle([...set, ...set]);
+  let open = [], moves = 0, found = 0, t0 = Date.now(), lock = false;
+  el.innerHTML = `<div class="hud"><span class="pill">حركات <b id="mv">0</b></span><span class="pill">أزواج <b id="fd">0/8</b></span></div>
+    <div class="mem">${cards.map((c, i) => `<button class="card" data-i="${i}">${c}</button>`).join('')}</div>`;
+  el.querySelector('.mem').onclick = (e) => {
+    const b = e.target.closest('.card'); if (!b || lock || b.classList.contains('up') || b.classList.contains('done')) return;
+    b.classList.add('up'); open.push(b);
+    if (open.length === 2) {
+      moves++; $('#mv').textContent = moves; const [x, y] = open;
+      if (x.textContent === y.textContent) { x.classList.replace('up', 'done'); y.classList.replace('up', 'done'); open = []; found++; $('#fd').textContent = found + '/8';
+        if (found === 8) { const secs = Math.round((Date.now() - t0) / 1000); setTimeout(() => endScreen(el, 'memory', Math.max(10, 1000 - moves * 15 - secs * 3), `خلصت في ${moves} حركة و ${secs} ثانية`, () => memory(el)), 500); } }
+      else { lock = true; setTimeout(() => { x.classList.remove('up'); y.classList.remove('up'); open = []; lock = false; }, 750); }
+    }
+  };
+}
+
+// ───── ⭕ إكس أو ─────
+function xo(el, keep) {
+  const st = keep || { wins: 0, level: 1 };
+  const L = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
+  const win = (b) => { for (const [a, c, d] of L) if (b[a] && b[a] === b[c] && b[a] === b[d]) return b[a]; return b.every(Boolean) ? 'T' : null; };
+  const mm = (b, me) => { const w = win(b); if (w === 'O') return { s: 10 }; if (w === 'X') return { s: -10 }; if (w === 'T') return { s: 0 };
+    let best = { s: me ? -99 : 99 }; b.forEach((v, i) => { if (v) return; b[i] = me ? 'O' : 'X'; const r = mm(b, !me); b[i] = null; if (me ? r.s > best.s : r.s < best.s) best = { s: r.s, i }; }); return best; };
+  const b = Array(9).fill(null); let over = false;
+  const names = ['', 'سهل 🙂', 'متوسط 😐', 'صعب 😈'];
+  el.innerHTML = `<div class="hud"><span class="pill">المستوى <b>${names[st.level]}</b></span><span class="pill">انتصاراتك <b>${st.wins}</b></span></div>
+    <div class="xo">${b.map((_, i) => `<button data-i="${i}"></button>`).join('')}</div><div class="msg" id="m">أنت ❌ — ابدأ!</div>
+    <div class="row" style="margin-top:8px">${[1, 2, 3].map((l) => `<button class="tool ${l === st.level ? 'on' : ''}" data-l="${l}">${names[l]}</button>`).join('')}</div>`;
+  const cells = el.querySelectorAll('.xo button');
+  const draw = () => cells.forEach((c, i) => { c.textContent = b[i] === 'X' ? '❌' : b[i] === 'O' ? '⭕' : ''; });
+  const done = (w) => {
+    over = true; const m = $('#m');
+    if (w === 'X') { st.wins++; m.className = 'msg ok'; m.textContent = '🎉 فزت!'; }
+    else if (w === 'O') { m.className = 'msg no'; m.textContent = '🤖 البوت فاز!'; }
+    else { m.className = 'msg'; m.textContent = '🤝 تعادل'; }
+    setTimeout(() => {
+      if (w === 'O' && st.wins > 0) return endScreen(el, 'xo', st.wins * st.level * 100, `فزت ${st.wins} مرة ورا بعض على مستوى ${names[st.level]}`, () => xo(el, { wins: 0, level: st.level }));
+      xo(el, w === 'O' ? { wins: 0, level: st.level } : st);
+    }, 1200);
+  };
+  el.querySelector('.xo').onclick = (e) => {
+    const c = e.target.closest('button'); if (!c || over || b[+c.dataset.i]) return;
+    b[+c.dataset.i] = 'X'; draw(); let w = win(b); if (w) return done(w);
+    const free = b.map((v, i) => (v ? null : i)).filter((v) => v !== null);
+    const smart = Math.random() < [0, 0.25, 0.7, 1][st.level];
+    b[smart ? mm(b, true).i : pick(free)] = 'O'; draw(); w = win(b); if (w) done(w);
+  };
+  el.querySelectorAll('[data-l]').forEach((t) => (t.onclick = () => xo(el, { wins: 0, level: +t.dataset.l })));
+}
+
+// ───── 🤷 لو خيروك ─────
+async function wyr(el) {
+  let votes = {}; try { votes = await api('/api/wyr'); } catch {}
+  const order = shuffle(C.wyr.map((_, i) => i)); let k = 0;
+  const show = () => {
+    const id = order[k % order.length]; const [a, b] = C.wyr[id];
+    el.innerHTML = `<div class="q">لو خيروك... 🤔</div><div class="wyr">
+      <button data-o="0"><i class="fill"></i><span>${esc(a)}<em class="pct"></em></span></button>
+      <button data-o="1"><i class="fill"></i><span>${esc(b)}<em class="pct"></em></span></button></div>
+      <div class="row" style="margin-top:14px"><button class="btn ghost" id="nx">التالي ⏭️</button></div>`;
+    let voted = false;
+    el.querySelector('.wyr').onclick = async (e) => {
+      const btn = e.target.closest('button'); if (!btn || voted) return; voted = true;
+      const o = +btn.dataset.o; let v = (votes[id] || [0, 0]).slice(); v[o]++;
+      try { v = (await api('/api/wyr', { id, opt: o })).votes; votes[id] = v; } catch {}
+      const tot = v[0] + v[1] || 1;
+      el.querySelectorAll('.wyr button').forEach((bt, j) => { const p = Math.round((v[j] / tot) * 100); bt.querySelector('.fill').style.height = p + '%'; bt.querySelector('.pct').textContent = p + '%'; if (j === o) bt.style.borderColor = 'var(--gold)'; });
+    };
+    $('#nx').onclick = () => { k++; show(); };
+  };
+  show();
+}
+
+// ───── 📿 المسبحة ─────
+function tasbih(el) {
+  const ADH = ['سبحان الله', 'الحمد لله', 'لا إله إلا الله', 'الله أكبر', 'أستغفر الله', 'لا حول ولا قوة إلا بالله', 'اللهم صل على محمد وآل محمد'];
+  let idx = store.get('tidx', 0), n = store.get('tcount', 0), total = store.get('ttotal', 0);
+  el.innerHTML = `<div class="tasbih"><div class="prompt" id="dk"></div><button class="bead" id="bd"></button>
+    <div class="hud" style="justify-content:center"><span class="pill">المجموع الكلي <b id="tt"></b></span></div>
+    <div class="row"><button class="btn ghost sm" id="nx">الذكر التالي ⏭️</button><button class="btn ghost sm" id="rs">تصفير 🔄</button></div></div>`;
+  const draw = () => { $('#dk').textContent = ADH[idx]; $('#bd').textContent = n; $('#tt').textContent = total; store.set('tidx', idx); store.set('tcount', n); store.set('ttotal', total); };
+  $('#bd').onclick = () => { n++; total++; if (navigator.vibrate) navigator.vibrate(15); if (n % 33 === 0) toast(`✨ ${n} — ${ADH[idx]}`); draw(); };
+  $('#nx').onclick = () => { idx = (idx + 1) % ADH.length; n = 0; draw(); };
+  $('#rs').onclick = () => { n = 0; draw(); };
+  draw();
+}
+
+// ───── 🎨 المرسم ─────
+function draw(el) {
+  const COLORS = ['#111111', '#ffffff', '#e53935', '#fb8c00', '#fdd835', '#43a047', '#00acc1', '#1e88e5', '#5e35b1', '#d81b60', '#8d6e63', '#9e9e9e', '#f5b942', '#a5d6a7', '#90caf9', '#f8bbd0'];
+  let color = '#111111', size = 6, tool = 'pen', prompt = pick(C.draw), timer = null, left = 0;
+  el.innerHTML = `<div class="studio">
+    <div class="prompt">ارسم: <b id="pr"></b> <button class="tool" id="newp">🎲 فكرة ثانية</button> <button class="tool" id="free">✍️ رسم حر</button></div>
+    <div class="tools">${COLORS.map((c) => `<button class="sw ${c === color ? 'on' : ''}" data-c="${c}" style="background:${c}"></button>`).join('')}
+      <input type="color" id="cc" value="#111111" title="لون مخصص" style="width:34px;height:34px;border:0;background:none"></div>
+    <div class="tools">
+      <button class="tool on" data-t="pen">🖊️ قلم</button><button class="tool" data-t="eraser">🧽 ممحاة</button><button class="tool" data-t="fill">🪣 تعبئة</button>
+      <label class="tool">الحجم <input type="range" id="sz" min="2" max="40" value="6" style="vertical-align:middle;width:90px"></label>
+      <button class="tool" id="undo">↩️ تراجع</button><button class="tool" id="clr">🗑️ مسح</button>
+      <button class="tool" id="tmr">⏱️ تحدي 60 ثانية</button><span class="pill" id="tl" style="display:none">⏳ <b>60</b></span>
+    </div>
+    <canvas id="cv" width="800" height="600"></canvas>
+    <div class="row"><button class="btn gold" id="send">📤 شارك في المعرض والسيرفر</button><button class="btn ghost" id="dl">⬇️ حمّل الرسمة</button></div>
+    <p class="hint">الرسومات تنزل في معرض الموقع وفي روم «رسومات-الموقع» بالسيرفر باسمك (${esc(nick())}). خلّها محترمة 🤍</p></div>`;
+  const cv = $('#cv'), ctx = cv.getContext('2d');
+  const undo = [];
+  const snap = () => { undo.push(ctx.getImageData(0, 0, cv.width, cv.height)); if (undo.length > 25) undo.shift(); };
+  const reset = () => { ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, cv.width, cv.height); };
+  reset();
+  const setPrompt = (p) => { prompt = p; $('#pr').textContent = p; };
+  setPrompt(prompt);
+  $('#newp').onclick = () => setPrompt(pick(C.draw)); $('#free').onclick = () => setPrompt('رسمة حرّة');
+  el.querySelectorAll('.sw').forEach((s) => (s.onclick = () => { color = s.dataset.c; el.querySelectorAll('.sw').forEach((x) => x.classList.toggle('on', x === s)); if (tool === 'eraser') setTool('pen'); }));
+  $('#cc').oninput = (e) => { color = e.target.value; el.querySelectorAll('.sw').forEach((x) => x.classList.remove('on')); };
+  $('#sz').oninput = (e) => (size = +e.target.value);
+  const setTool = (t) => { tool = t; el.querySelectorAll('[data-t]').forEach((x) => x.classList.toggle('on', x.dataset.t === t)); };
+  el.querySelectorAll('[data-t]').forEach((b) => (b.onclick = () => setTool(b.dataset.t)));
+  $('#undo').onclick = () => { if (undo.length) ctx.putImageData(undo.pop(), 0, 0); };
+  $('#clr').onclick = () => { snap(); reset(); };
+  const pos = (e) => { const r = cv.getBoundingClientRect(); return [((e.clientX - r.left) / r.width) * cv.width, ((e.clientY - r.top) / r.height) * cv.height]; };
+  let drawing = false, last = null;
+  const hex = (h) => { const n = parseInt(h.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; };
+  const flood = (x, y) => {
+    x = Math.floor(x); y = Math.floor(y); const img = ctx.getImageData(0, 0, cv.width, cv.height); const d = img.data, W = cv.width, H = cv.height;
+    const i0 = (y * W + x) * 4; const t = [d[i0], d[i0 + 1], d[i0 + 2]]; const c = hex(color);
+    if (Math.abs(t[0] - c[0]) + Math.abs(t[1] - c[1]) + Math.abs(t[2] - c[2]) < 10) return;
+    const same = (i) => Math.abs(d[i] - t[0]) + Math.abs(d[i + 1] - t[1]) + Math.abs(d[i + 2] - t[2]) < 60;
+    const st = [[x, y]]; const seen = new Uint8Array(W * H);
+    while (st.length) { const [px, py] = st.pop(); if (px < 0 || py < 0 || px >= W || py >= H) continue; const p = py * W + px; if (seen[p]) continue; seen[p] = 1; const i = p * 4; if (!same(i)) continue;
+      d[i] = c[0]; d[i + 1] = c[1]; d[i + 2] = c[2]; d[i + 3] = 255; st.push([px + 1, py], [px - 1, py], [px, py + 1], [px, py - 1]); }
+    ctx.putImageData(img, 0, 0);
+  };
+  cv.onpointerdown = (e) => { e.preventDefault(); cv.setPointerCapture(e.pointerId); snap(); const p = pos(e); if (tool === 'fill') return flood(...p); drawing = true; last = p; stroke(p); };
+  cv.onpointermove = (e) => { if (!drawing) return; const p = pos(e); stroke(p); last = p; };
+  cv.onpointerup = cv.onpointercancel = () => { drawing = false; };
+  function stroke(p) { ctx.strokeStyle = tool === 'eraser' ? '#ffffff' : color; ctx.lineWidth = tool === 'eraser' ? size * 2.5 : size; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.beginPath(); ctx.moveTo(...last); ctx.lineTo(...p); ctx.stroke(); }
+  $('#tmr').onclick = () => {
+    clearInterval(timer); left = 60; $('#tl').style.display = ''; $('#tl b').textContent = left; setPrompt(pick(C.draw)); snap(); reset(); toast('⏱️ عندك 60 ثانية! ارسم: ' + prompt);
+    timer = setInterval(() => { left--; $('#tl b').textContent = left; if (left <= 0) { clearInterval(timer); cv.style.pointerEvents = 'none'; toast('⏰ خلص الوقت! شارك رسمتك 👇'); setTimeout(() => (cv.style.pointerEvents = ''), 1500); } }, 1000);
+  };
+  $('#dl').onclick = () => { const a = document.createElement('a'); a.download = 'diwaniya-drawing.png'; a.href = cv.toDataURL('image/png'); a.click(); };
+  $('#send').onclick = async () => {
+    const btn = $('#send'); btn.disabled = true; btn.textContent = '⏳ جاري الإرسال...';
+    try {
+      const small = document.createElement('canvas'); small.width = 640; small.height = 480; small.getContext('2d').drawImage(cv, 0, 0, 640, 480);
+      await api('/api/gallery', { name: nick(), prompt, image: small.toDataURL('image/jpeg', 0.85) });
+      toast('🎉 وصلت رسمتك للمعرض وللسيرفر!'); btn.textContent = '✅ انرسلت'; loadGallery(true);
+    } catch (e) { toast('⚠️ ' + e.message); btn.disabled = false; btn.textContent = '📤 شارك في المعرض والسيرفر'; }
+  };
+  cleanup = () => clearInterval(timer);
+}
+
+// ───── المعرض واللوحات ─────
+async function loadGallery(force) {
+  try {
+    const { items } = await api('/api/gallery' + (force ? '?t=' + Date.now() : ''));
+    $('#gal').innerHTML = items.length ? items.slice(0, 24).map((it) => `<div class="gi"><img loading="lazy" src="${esc(it.url)}" alt="${esc(it.prompt)}"><div><b>${esc(it.prompt)}</b><small>✏️ ${esc(it.name)} ${it.likes ? ' • ❤️ ' + it.likes : ''}</small></div></div>`).join('')
+      : '<div class="empty">ما فيه رسومات للحين — كن أول واحد! 🎨</div>';
+  } catch { $('#gal').innerHTML = '<div class="empty">المعرض يصحى... جرّب بعد شوي 🌙</div>'; }
+}
+async function loadBoards() {
+  const ids = ['quiz', 'tf', 'emoji', 'scramble', 'riddle', 'proverb', 'typing', 'math', 'reaction', 'memory', 'xo'];
+  const res = await Promise.all(ids.map((g) => api('/api/top?game=' + g).catch(() => ({ top: [] }))));
+  const medals = ['🥇', '🥈', '🥉'];
+  $('#boardsBox').innerHTML = ids.map((g, k) => { const G = GAMES.find((x) => x.id === g); const top = res[k].top || [];
+    return `<div class="board"><h4>${G.ic} ${G.t}</h4><ol>${top.length ? top.slice(0, 5).map((r, i) => `<li><span>${medals[i] || i + 1 + '.'} ${esc(r.name)}</span><span>${r.score}</span></li>`).join('') : '<li><span style="color:var(--muted)">محد لعب للحين — كن الأول!</span><span></span></li>'}</ol>
+    <button class="tool" style="margin-top:10px" onclick="openGame('${g}')">العب ▶</button></div>`; }).join('');
+}
+
+// ───── التشغيل ─────
+$('#nick').value = store.get('nick', '');
+$('#nick').oninput = (e) => store.set('nick', e.target.value.slice(0, 20));
+renderGames();
+(async () => {
+  try { C = await api('/api/content'); } catch { C = DATA_FALLBACK; toast('⚠️ ما قدرت أحمّل الفعاليات، حدّث الصفحة'); }
+  renderGames();
+  const total = C.trivia.length + C.emoji.length + C.words.length + C.sentences.length + C.wyr.length + C.tf.length + C.riddles.length + C.proverbs.length + C.draw.length;
+  $('#sItems').textContent = total + '+';
+})();
+api('/api/info').then((i) => {
+  if (i.members) $('#sMembers').textContent = i.members;
+  $('#sOnline').textContent = i.online ?? '—';
+  $('#sPlays').textContent = i.plays || 0;
+  if (i.invite) { $('#joinBtn').href = i.invite; $('#joinFoot').href = i.invite; }
+  if (i.icon) { $('#logo').innerHTML = `<img src="${esc(i.icon)}" alt="ديوانية">`; $('#navIcon').outerHTML = `<img src="${esc(i.icon)}" alt="" style="width:34px;height:34px;border-radius:10px">`; }
+}).catch(() => {});
+loadGallery(); loadBoards();
+setInterval(loadGallery, 60000);
+
+// نجوم الخلفية
+(() => {
+  const c = $('#stars'), x = c.getContext('2d'); let S = [];
+  const size = () => { c.width = innerWidth; c.height = innerHeight; S = Array.from({ length: Math.round(innerWidth / 9) }, () => [Math.random() * c.width, Math.random() * c.height, Math.random() * 1.4 + 0.2, Math.random() * 6]); };
+  size(); addEventListener('resize', size);
+  const loop = (t) => { x.clearRect(0, 0, c.width, c.height); for (const [a, b, r, p] of S) { x.globalAlpha = 0.35 + 0.35 * Math.sin(t / 900 + p); x.fillStyle = '#fff'; x.beginPath(); x.arc(a, b, r, 0, 7); x.fill(); } requestAnimationFrame(loop); };
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
