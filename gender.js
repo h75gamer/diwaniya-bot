@@ -482,12 +482,15 @@ async function announce(g, generalToo = true) {
   const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setURL(site).setLabel('افتح الموقع').setEmoji('🌐').setStyle(ButtonStyle.Link));
   const ann = g.channels.cache.find((c) => (c.type === ChannelType.GuildAnnouncement || c.type === ChannelType.GuildText) && /الإعلانات|الاعلانات/.test(c.name));
   const general = g.channels.cache.find((c) => c.type === ChannelType.GuildText && /عام/.test(c.name) && !/bot-/.test(c.name));
-  if (ann) await sendFix(g, ann, { embeds: [e], components: [row] }).then(() => console.log('📣 نزل إعلان التحديث')).catch((er) => console.error('⚠️ announce:', er.message));
+  let posted = false;
+  if (ann) posted = await sendFix(g, ann, { embeds: [e], components: [row] }).then(() => true).catch((er) => { console.error('⚠️ announce:', er.message); return false; });
+  if (!posted && general) posted = await general.send({ embeds: [e], components: [row] }).then(() => true).catch(() => false);
+  console.log(posted ? '📣 نزل إعلان التحديث' : '⚠️ ما قدرت أنزل إعلان التحديث');
   if (general && generalToo) {
     const m = await general.send({ embeds: [new EmbedBuilder().setColor(0xf5b942).setTitle('🌐 موقع الديوانية').setDescription(`${site}\nألعاب، رسم، تحديات وفعاليات مباشرة — بدون تسجيل 🎮`)], components: [row] }).catch(() => null);
     if (m) await m.pin().catch(() => {});
   }
-  data.announced = true; data.announcedV = 2; dirty = true;
+  data.announced = true; data.announcedV = 3; dirty = true;
   await save(true);
 }
 
@@ -516,7 +519,7 @@ function init(c) {
           await ensureSetup(g, { gate: true });
           askExisting(g).catch((e) => console.error('⚠️ askExisting:', e.message));
         } else await ensureSetup(g, { gate: !data.gateOff }); // يتأكد إن الرتب والرومات موجودة ويقفل أي روم جديدة
-        if (data.announcedV !== 2) await announce(g, !data.announced);
+        if (data.announcedV !== 3) await announce(g, !data.announced);
       } catch (e) { console.error('⚠️ gender setup:', e); }
     }, 15000);
     setInterval(() => checkWarns().then(() => save()).catch((e) => console.error('⚠️ warns:', e.message)), 10 * 60000);
