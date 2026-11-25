@@ -16,7 +16,7 @@
 <meta name="twitter:card" content="summary">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@500;600;700&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#0d0a1f; --bg2:#151033; --card:#1c1640; --card2:#241d52; --line:#2f2768;
@@ -198,38 +198,186 @@ footer small{opacity:.7}
 .howto{margin-top:16px;background:var(--card);border:1px dashed var(--line);border-radius:var(--r);padding:16px 20px;color:var(--muted);font-size:15px}
 .howto b{color:var(--text)}
 @media(max-width:760px){nav .links{display:none}.opts,.wyr{grid-template-columns:1fr}.hero{padding-top:40px}}
+
+/* ═════════ ثيم الديوانية ☕ (سدو، دلة، فوانيس) ═════════ */
+:root{
+  --bg:#140c08; --bg2:#1c120c; --card:#26180f; --card2:#332116; --line:#4a3021;
+  --gold:#d9a441; --gold2:#f2cd7a; --text:#f7ecd9; --muted:#c7ad8f; --good:#4fbf8a; --bad:#e2574c; --violet:#3aa394;
+  --sadu:#9b1d20; --cream:#efe0c4; --r:18px;
+}
+body{background:var(--bg)}
+body::before{background:
+  radial-gradient(ellipse at 15% 0%,#e8a33a2b,transparent 45%),
+  radial-gradient(ellipse at 85% 10%,#e8a33a1f,transparent 40%),
+  radial-gradient(ellipse at 50% 120%,#9b1d2033,transparent 55%),
+  url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='90' height='90'><g fill='none' stroke='%23d9a441' stroke-opacity='.07' stroke-width='1.2'><rect x='27' y='27' width='36' height='36'/><rect x='27' y='27' width='36' height='36' transform='rotate(45 45 45)'/><circle cx='45' cy='45' r='9'/><path d='M0 45h18M72 45h18M45 0v18M45 72v18'/></g></svg>"),var(--bg)}
+.stars{opacity:.35}
+h1,h2,h3,.brand,.kufi{font-family:'Reem Kufi','Tajawal',sans-serif}
+.sadu{height:16px;background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='16'><rect width='48' height='16' fill='%239b1d20'/><rect y='0' width='48' height='2' fill='%23efe0c4'/><rect y='14' width='48' height='2' fill='%23efe0c4'/><path d='M0 14 8 4l8 10zM24 14l8-10 8 10z' fill='%23140c08'/><path d='M20 5l4 3-4 3-4-3zM44 5l4 3-4 3-4-3z' fill='%23efe0c4'/><circle cx='8' cy='10' r='1.3' fill='%23efe0c4'/><circle cx='32' cy='10' r='1.3' fill='%23efe0c4'/></svg>") repeat-x;opacity:.95}
+nav{background:#140c08e6;border-bottom:0}
+nav .wrap{height:66px}
+.brand{font-size:24px;font-weight:700;color:var(--gold2)}
+nav .links a:hover{background:var(--card2)}
+.nick{background:var(--card2)}
+.btn.gold{background:linear-gradient(135deg,#f2cd7a,#c98a2a);color:#2a1606;box-shadow:0 8px 24px #d9a44133}
+.btn.ghost{background:#26180fcc;border-color:var(--line)}
+.chip.on,.tool.on{background:var(--gold);color:#2a1606}
+
+/* الواجهة: مجلس */
+.hero{padding:44px 0 30px;text-align:right;display:grid;grid-template-columns:1.05fr .95fr;gap:34px;align-items:center}
+.hero .txt{order:1}
+.hero .art{order:2;position:relative}
+.hero .kicker{display:inline-flex;align-items:center;gap:8px;background:var(--card2);border:1px solid var(--line);color:var(--gold2);padding:6px 14px;border-radius:999px;font-weight:800;font-size:14px}
+.hero h1{font-size:clamp(38px,5.6vw,64px);font-weight:700;margin-top:14px;line-height:1.25}
+.hero h1 span{background:linear-gradient(90deg,#f7dd9a,#d9a441,#f2cd7a);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p.sub{margin:14px 0 24px;max-width:560px;color:var(--muted);text-wrap:pretty}
+.hero .cta{justify-content:flex-start}
+.hero .logo{display:none}
+.stats{justify-content:flex-start;margin-top:28px}
+.stat{background:linear-gradient(180deg,var(--card2),var(--card));border-color:var(--line);border-radius:14px 14px 22px 22px;position:relative;padding:12px 20px 12px;min-width:118px;text-align:center}
+.stat::before{content:"";position:absolute;top:-1px;left:14px;right:14px;height:4px;border-radius:0 0 4px 4px;background:var(--gold)}
+.majlis{width:100%;height:auto;display:block;filter:drop-shadow(0 30px 40px #0009)}
+.steam path{animation:steam 3.2s ease-in-out infinite;opacity:0}
+.steam path:nth-child(2){animation-delay:1s}.steam path:nth-child(3){animation-delay:2s}
+@keyframes steam{0%{opacity:0;transform:translateY(8px)}35%{opacity:.7}100%{opacity:0;transform:translateY(-22px)}}
+.glow{animation:flick 2.6s ease-in-out infinite}
+.glow.b{animation-delay:1.1s}
+@keyframes flick{0%,100%{opacity:.55}45%{opacity:.9}60%{opacity:.7}}
+.swing{transform-origin:top center;animation:swing 6s ease-in-out infinite}
+.swing.b{animation-delay:-3s}
+@keyframes swing{0%,100%{transform:rotate(1.6deg)}50%{transform:rotate(-1.6deg)}}
+.livebar{margin:20px 0 0;background:linear-gradient(135deg,#4a1414,#26180f);border-color:#7a2a22}
+
+/* الأقسام */
+section{padding:50px 0;position:relative}
+.sec-h h2{font-size:34px;font-weight:700;color:var(--cream)}
+.sec-h h2::after{content:"";display:block;width:120px;height:10px;margin-top:6px;background:
+  radial-gradient(circle at 50% 50%,var(--gold) 3px,transparent 4px) center/14px 10px no-repeat,
+  linear-gradient(90deg,transparent,var(--gold) 20%,var(--gold) 80%,transparent) center/100% 1.5px no-repeat}
+.feat,.lgame,.game,.board,.gi,.howto{background:linear-gradient(180deg,var(--card2),var(--card));border-color:var(--line)}
+.feat,.lgame{position:relative;overflow:hidden;border-radius:26px 26px 16px 16px;padding-top:24px}
+.feat::before,.lgame::before,.game::before{content:"";position:absolute;top:0;left:0;right:0;height:7px;background:inherit;background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='7'><rect width='24' height='7' fill='%239b1d20'/><path d='M0 7 6 1l6 6zM12 7l6-6 6 6z' fill='%23140c08'/><circle cx='6' cy='5' r='.9' fill='%23efe0c4'/><circle cx='18' cy='5' r='.9' fill='%23efe0c4'/></svg>") repeat-x}
+.game{padding-top:22px}
+.feat:hover,.lgame:hover,.game:hover{border-color:var(--gold);box-shadow:0 16px 36px #000a, 0 0 0 1px #d9a44133}
+.feat .ic,.lgame .ic{width:56px;height:56px;display:grid;place-items:center;font-size:30px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#4a3021,#26180f);border:1px solid #6b4a2e;margin-bottom:6px}
+.feat h3,.lgame h3,.game h3{color:var(--cream)}
+.howto{border-style:solid;border-color:#6b4a2e}
+.panel{background:var(--bg2)}
+.panel-h{background:var(--card2)}
+.board li{border-bottom-color:#4a302188}
+.bead{background:radial-gradient(circle at 35% 30%,#6b3a1f,#2a160b)}
+footer{background:linear-gradient(180deg,transparent,#0d0805);border-top:0;padding-top:0}
+footer .sadu{margin-bottom:28px}
+footer .fbrand{font-family:'Reem Kufi',sans-serif;font-weight:700;font-size:24px;color:var(--gold2)}
+@media(max-width:900px){.hero{grid-template-columns:1fr;text-align:center;padding-inline:18px}.hero .art{order:0;max-width:440px;margin:auto}.hero .cta,.stats{justify-content:center}.hero p.sub{margin-inline:auto}}
 </style>
 </head>
 <body>
 <canvas class="stars" id="stars"></canvas>
 
 <nav><div class="wrap">
-  <a class="brand" href="#top"><span id="navIcon" class="moon">🌙</span>ديوانية</a>
+  <a class="brand" href="#top"><span id="navIcon" class="moon">☕</span>ديوانية</a>
   <div class="links">
-    <a href="#about">عن السيرفر</a><a href="#live">🔴 مباشر</a><a href="#events">الفعاليات</a><a href="#gallery">المعرض</a><a href="#boards">المتصدرين</a>
+    <a href="#about">المجلس</a><a href="#live">🔴 مباشر</a><a href="#events">الألعاب</a><a href="#gallery">المعرض</a><a href="#boards">صدر المجلس</a>
   </div>
   <label class="nick" title="اسمك يظهر في لوحات المتصدرين والمعرض">✏️<input id="nick" maxlength="20" placeholder="اكتب اسمك"></label>
-</div></nav>
+</div><div class="sadu"></div></nav>
 
 <header class="hero wrap" id="top">
-  <div class="logo" id="logo">🌙</div>
-  <h1>هلا بك في <span>ديوانية</span></h1>
-  <p class="sub">مجتمع عربي على ديسكورد للسوالف والألعاب والراحة 🌙 — قرآن 24 ساعة، ذكاء اصطناعي يسولف بلهجتنا، تحديات يومية، والحين: <b>مئات الفعاليات هنا بدون أي تسجيل!</b></p>
-  <div class="cta">
-    <a class="btn gold" id="joinBtn" href="https://discord.gg/Jd7PhFDARx" target="_blank" rel="noopener">🚀 ادخل السيرفر</a>
-    <a class="btn ghost" href="#events">🎮 العب الحين</a>
-  </div>
-  <a class="livebar" id="liveBar" href="/live"><span class="pulse"></span><span id="liveTxt">فعالية مباشرة الحين!</span><span class="go">ادخل 🚀</span></a>
-  <div class="stats">
+  <div class="txt">
+    <div class="logo" id="logo">☕</div>
+    <span class="kicker">☕ تفضّل.. القهوة جاهزة والشاي على النار</span>
+    <h1>حيّاك الله في <span>الديوانية</span></h1>
+    <p class="sub">مجلسك على ديسكورد 🌙 سوالف وضحك، قهوة وشاي، قرآن 24 ساعة، ذكاء يسولف بلهجتنا، و<b>مئات الفعاليات هنا بدون أي تسجيل!</b></p>
+    <div class="cta">
+      <a class="btn gold" id="joinBtn" href="https://discord.gg/Jd7PhFDARx" target="_blank" rel="noopener">☕ تفضّل ادخل الديوانية</a>
+      <a class="btn ghost" href="#events">🎲 العب الحين</a>
+    </div>
+    <a class="livebar" id="liveBar" href="/live"><span class="pulse"></span><span id="liveTxt">فعالية مباشرة الحين!</span><span class="go">ادخل 🚀</span></a>
+    <div class="stats">
     <div class="stat"><b id="sMembers">—</b><small>👥 عضو</small></div>
     <div class="stat"><b id="sOnline">—</b><small><span class="dot"></span>متصل الحين</small></div>
     <div class="stat"><b id="sItems">—</b><small>🎯 فعالية وسؤال</small></div>
     <div class="stat"><b id="sPlays">—</b><small>🏆 نتيجة مسجلة</small></div>
   </div>
+  </div>
+  <div class="art"><svg class="majlis" viewBox="0 0 520 430" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="مجلس ديوانية فيه دلة وفناجيل وشاي">
+  <defs>
+    <linearGradient id="night" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0d1a36"/><stop offset="1" stop-color="#2a1d3a"/></linearGradient>
+    <linearGradient id="goldg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fbe3a2"/><stop offset=".5" stop-color="#d9a441"/><stop offset="1" stop-color="#8f5d1c"/></linearGradient>
+    <linearGradient id="cush" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9b2a24"/><stop offset="1" stop-color="#5e1513"/></linearGradient>
+    <linearGradient id="tea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c2361c" stop-opacity=".9"/><stop offset="1" stop-color="#6e1208"/></linearGradient>
+    <radialGradient id="lamp"><stop offset="0" stop-color="#ffd27a" stop-opacity=".9"/><stop offset=".45" stop-color="#ffb347" stop-opacity=".35"/><stop offset="1" stop-color="#ffb347" stop-opacity="0"/></radialGradient>
+    <pattern id="sadu" width="28" height="14" patternUnits="userSpaceOnUse">
+      <rect width="28" height="14" fill="#9b1d20"/><rect width="28" height="1.6" fill="#efe0c4"/><rect y="12.4" width="28" height="1.6" fill="#efe0c4"/>
+      <path d="M0 12 7 3l7 9zM14 12l7-9 7 9z" fill="#1a0e09"/><path d="M14 4l3 3-3 3-3-3z" fill="#efe0c4"/><circle cx="7" cy="9" r="1.2" fill="#efe0c4"/><circle cx="21" cy="9" r="1.2" fill="#efe0c4"/>
+    </pattern>
+    <pattern id="lattice" width="16" height="16" patternUnits="userSpaceOnUse"><path d="M8 0 16 8 8 16 0 8z" fill="none" stroke="#d9a441" stroke-opacity=".35" stroke-width="1.2"/></pattern>
+  </defs>
+
+  <!-- النافذة المقوسة -->
+  <path d="M140 268V128Q140 44 260 20Q380 44 380 128V268Z" fill="url(#night)"/>
+  <g fill="#fff"><circle cx="190" cy="80" r="1.6"/><circle cx="230" cy="58" r="1.2"/><circle cx="345" cy="150" r="1.4"/><circle cx="170" cy="150" r="1.1"/><circle cx="215" cy="120" r="1.5"/><circle cx="355" cy="100" r="1"/></g>
+  <circle cx="300" cy="92" r="26" fill="#f6dc93"/><circle cx="312" cy="84" r="23" fill="#122042"/>
+  <rect x="140" y="190" width="240" height="78" fill="url(#lattice)"/>
+  <path d="M140 268V128Q140 44 260 20Q380 44 380 128V268" fill="none" stroke="url(#goldg)" stroke-width="7"/>
+  <path d="M260 24V268M140 190H380" stroke="#8f5d1c" stroke-width="3" opacity=".7"/>
+
+  <!-- فوانيس -->
+  <g class="swing"><line x1="70" y1="0" x2="70" y2="70" stroke="#8f5d1c" stroke-width="2"/>
+    <circle class="glow" cx="70" cy="104" r="56" fill="url(#lamp)"/>
+    <path d="M58 70h24l6 12H52z" fill="url(#goldg)"/><rect x="54" y="82" width="32" height="44" rx="5" fill="#ffcf73" opacity=".92"/>
+    <path d="M62 82v44M70 82v44M78 82v44" stroke="#8f5d1c" stroke-width="1.6"/><rect x="54" y="82" width="32" height="44" rx="5" fill="none" stroke="url(#goldg)" stroke-width="3"/>
+    <path d="M54 126h32l-6 10H60z" fill="url(#goldg)"/><circle cx="70" cy="140" r="3" fill="#d9a441"/></g>
+  <g class="swing b"><line x1="452" y1="0" x2="452" y2="96" stroke="#8f5d1c" stroke-width="2"/>
+    <circle class="glow b" cx="452" cy="128" r="50" fill="url(#lamp)"/>
+    <path d="M442 96h20l5 10h-30z" fill="url(#goldg)"/><path d="M440 106h24l4 22-4 22h-24l-4-22z" fill="#ffcf73" opacity=".92"/>
+    <path d="M452 106v44" stroke="#8f5d1c" stroke-width="1.6"/><path d="M440 106h24l4 22-4 22h-24l-4-22z" fill="none" stroke="url(#goldg)" stroke-width="3"/>
+    <circle cx="452" cy="156" r="3" fill="#d9a441"/></g>
+
+  <!-- المساند والجلسة -->
+  <g>
+    <rect x="22" y="236" width="112" height="62" rx="14" fill="url(#cush)"/><rect x="142" y="236" width="112" height="62" rx="14" fill="url(#cush)"/>
+    <rect x="262" y="236" width="112" height="62" rx="14" fill="url(#cush)"/><rect x="382" y="236" width="116" height="62" rx="14" fill="url(#cush)"/>
+    <g fill="url(#sadu)"><rect x="22" y="258" width="112" height="14"/><rect x="142" y="258" width="112" height="14"/><rect x="262" y="258" width="112" height="14"/><rect x="382" y="258" width="116" height="14"/></g>
+    <g fill="none" stroke="#d9a441" stroke-width="2" opacity=".8"><rect x="22" y="236" width="112" height="62" rx="14"/><rect x="142" y="236" width="112" height="62" rx="14"/><rect x="262" y="236" width="112" height="62" rx="14"/><rect x="382" y="236" width="116" height="62" rx="14"/></g>
+    <rect x="10" y="292" width="500" height="44" rx="10" fill="url(#sadu)"/>
+    <rect x="10" y="292" width="500" height="44" rx="10" fill="none" stroke="#efe0c4" stroke-opacity=".5" stroke-width="2"/>
+    <ellipse cx="18" cy="290" rx="16" ry="30" fill="url(#cush)" stroke="#d9a441" stroke-width="2"/><ellipse cx="502" cy="290" rx="16" ry="30" fill="url(#cush)" stroke="#d9a441" stroke-width="2"/>
+  </g>
+
+  <!-- الزولية -->
+  <rect x="50" y="338" width="420" height="88" rx="6" fill="#6e1714"/>
+  <rect x="60" y="346" width="400" height="72" rx="4" fill="none" stroke="#efe0c4" stroke-opacity=".55" stroke-width="2" stroke-dasharray="8 5"/>
+  <rect x="72" y="356" width="376" height="52" fill="url(#sadu)" opacity=".35"/>
+
+  <!-- الصينية والدلة والفناجيل والشاي -->
+  <ellipse cx="260" cy="392" rx="120" ry="20" fill="#8f5d1c"/><ellipse cx="260" cy="388" rx="116" ry="17" fill="url(#goldg)"/>
+  <g>
+    <path d="M214 340Q196 332 192 304Q191 296 183 293l-2 4q6 3 6 9 2 28 24 42z" fill="url(#goldg)"/>
+    <path d="M212 388Q200 362 210 342Q218 326 230 324Q242 326 250 342Q260 362 248 388z" fill="url(#goldg)"/>
+    <path d="M222 324l2-18h12l2 18z" fill="url(#goldg)"/>
+    <path d="M218 306q12-22 24 0z" fill="url(#goldg)"/><circle cx="230" cy="291" r="4" fill="#f6dc93"/>
+    <path d="M249 334q20 2 17 24-3 16-17 18" fill="none" stroke="url(#goldg)" stroke-width="4" stroke-linecap="round"/>
+    <path d="M214 352h32" stroke="#8f5d1c" stroke-width="2" opacity=".6"/>
+  </g>
+  <g><path d="M276 388l2-14h18l2 14z" fill="#f4ead6"/><ellipse cx="287" cy="374" rx="9" ry="2.4" fill="#b07a32"/>
+     <path d="M304 388l2-14h18l2 14z" fill="#f4ead6"/><ellipse cx="315" cy="374" rx="9" ry="2.4" fill="#b07a32"/>
+     <path d="M276 384h22M304 384h22" stroke="#2fa58f" stroke-width="2"/></g>
+  <g><ellipse cx="350" cy="389" rx="16" ry="4" fill="#efe0c4" opacity=".85"/>
+     <path d="M340 386q-3-10 3-17-6-7-3-18h20q3 11-3 18 6 7 3 17z" fill="url(#tea)" stroke="#fff" stroke-opacity=".5" stroke-width="1.2"/>
+     <path d="M343 354q1 8 4 12" stroke="#fff" stroke-opacity=".6" stroke-width="2" fill="none"/></g>
+  <g><ellipse cx="170" cy="390" rx="22" ry="8" fill="#efe0c4" opacity=".9"/>
+     <g fill="#5a2a10"><ellipse cx="162" cy="385" rx="6" ry="3.4"/><ellipse cx="173" cy="384" rx="6" ry="3.4"/><ellipse cx="180" cy="388" rx="5" ry="3"/><ellipse cx="168" cy="380" rx="5" ry="3"/></g></g>
+  <g class="steam" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round">
+    <path d="M350 344q-6-8 0-16t0-16"/><path d="M186 286q-6-8 0-16t0-16"/><path d="M296 368q-5-7 0-14t0-14"/>
+  </g>
+</svg>
+</div>
 </header>
 
 <section id="about"><div class="wrap">
-  <div class="sec-h"><div><h2>وش في الديوانية؟ 🏠</h2><p>كل شيء تحتاجه لسهرة حلوة مع ناس طيبين</p></div></div>
+  <div class="sec-h"><div><h2>وش في المجلس؟ ☕</h2><p>كل شي تبيه لسهرة حلوة مع ناس طيبين — والقهوة علينا</p></div></div>
   <div class="features">
     <div class="feat"><div class="ic">📖</div><h3>قرآن 24 ساعة</h3><p>روم صوتي فيه إذاعة قرآن ما توقف، وتقدر تختار من 12 قارئ.</p></div>
     <div class="feat"><div class="ic">🤖</div><h3>ذكاء يسولف بلهجتنا</h3><p>بوت ذكاء اصطناعي يعرف السيرفر ويسولف معك بالسعودي.</p></div>
@@ -243,7 +391,7 @@ footer small{opacity:.7}
 </div></section>
 
 <section id="live"><div class="wrap">
-  <div class="sec-h"><div><h2>الفعاليات المباشرة 🔴</h2><p>صاحب السيرفر يفتح غرفة، والكل يدخل من نفس الرابط ويلعبون مع بعض لايف — بدون تسجيل</p></div>
+  <div class="sec-h"><div><h2>سهرة الديوانية المباشرة 🔴</h2><p>صاحب السيرفر يفتح غرفة، والكل يدخل من نفس الرابط ويلعبون مع بعض لايف — بدون تسجيل</p></div>
     <a class="btn gold sm" href="/live">🎮 دخول غرفة</a></div>
   <div class="lgames">
     <div class="lgame"><div class="ic">📞</div><h3>هاتف خربان</h3><p>تكتب جملة ← اللي بعدك يرسمها ← اللي بعده يخمّن... وبالأخير ألبوم يموّت ضحك 😂</p></div>
@@ -256,28 +404,28 @@ footer small{opacity:.7}
 </div></section>
 
 <section id="events"><div class="wrap">
-  <div class="sec-h"><div><h2>الفعاليات 🎉</h2><p>العب على طول — بدون حساب ولا تسجيل. اكتب اسمك فوق عشان يطلع في المتصدرين.</p></div>
+  <div class="sec-h"><div><h2>ألعاب الديوانية 🎲</h2><p>العب على طول — بدون حساب ولا تسجيل. اكتب اسمك فوق عشان تطلع في صدر المجلس.</p></div>
     <button class="btn gold sm" id="randomBtn">🎲 فعالية عشوائية</button></div>
   <div class="filters" id="filters"></div>
   <div class="games" id="games"></div>
 </div></section>
 
 <section id="gallery"><div class="wrap">
-  <div class="sec-h"><div><h2>معرض الرسومات 🖼️</h2><p>رسومات الزوار من «مرسم الديوانية» — وتنزل كمان في روم المعرض بالسيرفر</p></div>
+  <div class="sec-h"><div><h2>جدار المجلس 🖼️</h2><p>رسومات الزوار من «مرسم الديوانية» — وتنزل كمان في روم المعرض بالسيرفر</p></div>
     <button class="btn ghost sm" onclick="openGame('draw')">🎨 ارسم وشارك</button></div>
   <div class="gal" id="gal"><div class="empty">جاري التحميل...</div></div>
 </div></section>
 
 <section id="boards"><div class="wrap">
-  <div class="sec-h"><div><h2>المتصدرين 🏆</h2><p>أعلى النتائج في كل لعبة</p></div></div>
+  <div class="sec-h"><div><h2>صدر المجلس 🏆</h2><p>أعلى النتائج في كل لعبة — والصدارة لمن يستاهلها</p></div></div>
   <div class="boards" id="boardsBox"></div>
 </div></section>
 
-<footer><div class="wrap">
-  <div class="fbrand"><img src="/icon.png" alt="" onerror="this.remove()">ديوانية 🌙</div>
-  <div class="flinks"><a href="#about">عن السيرفر</a><a href="/live">🔴 الفعاليات المباشرة</a><a href="#events">الفعاليات</a><a href="#gallery">المعرض</a><a href="#boards">المتصدرين</a></div>
+<footer><div class="sadu"></div><div class="wrap">
+  <div class="fbrand"><img src="/icon.png" alt="" onerror="this.remove()">الديوانية مفتوحة 24 ساعة ☕</div>
+  <div class="flinks"><a href="#about">المجلس</a><a href="/live">🔴 السهرة المباشرة</a><a href="#events">الألعاب</a><a href="#gallery">جدار المجلس</a><a href="#boards">صدر المجلس</a></div>
   <a class="btn gold sm" href="https://discord.gg/Jd7PhFDARx" id="joinFoot" target="_blank" rel="noopener">💬 انضم لنا في ديسكورد</a>
-  <p style="margin-top:16px"><small>صُنع بحب لمجتمع ديوانية — <span id="yr">2026</span></small></p>
+  <p style="margin-top:16px"><small>صُنع بحب لأهل الديوانية — حيّاكم دايم 🤍 — <span id="yr">2026</span></small></p>
 </div></footer>
 
 <div class="modal" id="modal"><div class="panel">
