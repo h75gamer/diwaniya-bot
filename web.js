@@ -20,6 +20,29 @@ let store = { top: {}, wyr: {}, plays: 0 };
 let loaded = false;
 let dirty = false;
 let galleryCache = { at: 0, items: [] };
+// أيقونة الموقع = شعار السيرفر (تتحدث تلقائي لو تغيّر)
+const iconCache = {};
+const FALLBACK_ICON = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="16" fill="#241d52"/><path d="M40 14a20 20 0 1 0 12 30A16 16 0 1 1 40 14z" fill="#f5b942"/></svg>';
+async function serveIcon(res, size) {
+  const c = iconCache[size];
+  if (c && Date.now() - c.at < 6 * 3600000) {
+    res.writeHead(200, { 'Content-Type': c.type, 'Cache-Control': 'public, max-age=21600' });
+    return res.end(c.buf);
+  }
+  try {
+    const url = guild()?.iconURL({ extension: 'png', size, forceStatic: true });
+    if (!url) throw new Error('no icon');
+    const r = await fetch(url);
+    if (!r.ok) throw new Error(`icon ${r.status}`);
+    const buf = Buffer.from(await r.arrayBuffer());
+    iconCache[size] = { buf, type: 'image/png', at: Date.now() };
+    res.writeHead(200, { 'Content-Type': 'image/png', 'Cache-Control': 'public, max-age=21600' });
+    return res.end(buf);
+  } catch {
+    res.writeHead(200, { 'Content-Type': 'image/svg+xml', 'Cache-Control': 'public, max-age=600' });
+    return res.end(FALLBACK_ICON);
+  }
+}
 let countsCache = { at: 0, online: null, members: null };
 const rate = new Map();
 
@@ -93,6 +116,14 @@ async function load() {
     const msgs = await ch.messages.fetch({ limit: 10 });
     const m = msgs.filter((x) => x.author.id === client.user.id && x.attachments.size).first();
     if (m) store = { ...store, ...JSON.parse(await (await fetch(m.attachments.first().url)).text()) };
+    // تنظيف نتائج التجربة
+    let removed = 0;
+    for (const k of Object.keys(store.top || {})) {
+      const before = store.top[k].length;
+      store.top[k] = store.top[k].filter((x) => x.name !== 'اختبار');
+      removed += before - store.top[k].length;
+    }
+    if (removed) { store.plays = Math.max(0, (store.plays || 0) - removed); dirty = true; }
   } catch (e) { console.error('⚠️ web load:', e.message); }
   loaded = true;
 }
@@ -134,6 +165,7 @@ async function galleryList() {
     if (m.author.id !== client.user.id) continue;
     const img = m.embeds[0]?.image?.url || m.attachments.first()?.url;
     if (!img) continue;
+    if (m.embeds[0]?.author?.name === 'بوت الديوانية') { m.delete().catch(() => {}); continue; } // رسمة التجربة
     const likes = m.reactions.cache.get('❤️')?.count || 0;
     items.push({ url: img, name: m.embeds[0]?.author?.name || 'زائر', prompt: m.embeds[0]?.title?.replace(/^🎨\s*/, '') || '', ts: m.createdTimestamp, likes: Math.max(0, likes - 1) });
   }
@@ -253,6 +285,8 @@ function start() {
         res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-cache' });
         return res.end(page('live.html'));
       }
+      if (url.pathname === '/favicon.ico' || url.pathname === '/favicon.png') return await serveIcon(res, 64);
+      if (url.pathname === '/icon.png') return await serveIcon(res, 256);
       if (url.pathname === '/health') return send(res, 200, '🌙 بوت الديوانية شغّال', 'text/plain; charset=utf-8');
       if (url.pathname === '/' || url.pathname === '/index.html') {
         res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'public, max-age=60' });
