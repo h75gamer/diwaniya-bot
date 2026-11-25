@@ -171,6 +171,18 @@ canvas#cv{width:100%;aspect-ratio:4/3;background:#fff;border-radius:16px;touch-a
 footer{border-top:1px solid var(--line);padding:30px 0;color:var(--muted);text-align:center;margin-top:30px}
 .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(120px);background:var(--card2);border:1px solid var(--gold);padding:12px 20px;border-radius:14px;font-weight:800;z-index:200;transition:.3s;max-width:90vw}
 .toast.show{transform:translateX(-50%) translateY(0)}
+
+/* الفعاليات المباشرة */
+.livebar{display:none;margin:22px auto 0;max-width:640px;align-items:center;gap:12px;background:linear-gradient(135deg,#3a1622,#241d52);border:1px solid #6b2338;border-radius:16px;padding:12px 18px;font-weight:800;text-align:right}
+.livebar.on{display:flex}
+.livebar .pulse{width:12px;height:12px;border-radius:50%;background:#ff5d73;box-shadow:0 0 12px #ff5d73;animation:lp 1.2s infinite;flex-shrink:0}
+@keyframes lp{50%{opacity:.3}}
+.livebar .go{margin-inline-start:auto;background:var(--gold);color:#1b1300;border-radius:11px;padding:6px 14px;white-space:nowrap}
+.lgames{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
+.lgame{background:linear-gradient(160deg,#2a1840,var(--card));border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.lgame .ic{font-size:36px}.lgame h3{font-size:18px;margin:4px 0}.lgame p{color:var(--muted);font-size:14.5px}
+.howto{margin-top:16px;background:var(--card);border:1px dashed var(--line);border-radius:var(--r);padding:16px 20px;color:var(--muted);font-size:15px}
+.howto b{color:var(--text)}
 @media(max-width:760px){nav .links{display:none}.opts,.wyr{grid-template-columns:1fr}.hero{padding-top:40px}}
 </style>
 </head>
@@ -180,7 +192,7 @@ footer{border-top:1px solid var(--line);padding:30px 0;color:var(--muted);text-a
 <nav><div class="wrap">
   <a class="brand" href="#top"><span id="navIcon" class="moon">🌙</span>ديوانية</a>
   <div class="links">
-    <a href="#about">عن السيرفر</a><a href="#events">الفعاليات</a><a href="#gallery">المعرض</a><a href="#boards">المتصدرين</a>
+    <a href="#about">عن السيرفر</a><a href="#live">🔴 مباشر</a><a href="#events">الفعاليات</a><a href="#gallery">المعرض</a><a href="#boards">المتصدرين</a>
   </div>
   <label class="nick" title="اسمك يظهر في لوحات المتصدرين والمعرض">✏️<input id="nick" maxlength="20" placeholder="اكتب اسمك"></label>
 </div></nav>
@@ -193,6 +205,7 @@ footer{border-top:1px solid var(--line);padding:30px 0;color:var(--muted);text-a
     <a class="btn gold" id="joinBtn" href="https://discord.gg/Jd7PhFDARx" target="_blank" rel="noopener">🚀 ادخل السيرفر</a>
     <a class="btn ghost" href="#events">🎮 العب الحين</a>
   </div>
+  <a class="livebar" id="liveBar" href="/live"><span class="pulse"></span><span id="liveTxt">فعالية مباشرة الحين!</span><span class="go">ادخل 🚀</span></a>
   <div class="stats">
     <div class="stat"><b id="sMembers">—</b><small>👥 عضو</small></div>
     <div class="stat"><b id="sOnline">—</b><small><span class="dot"></span>متصل الحين</small></div>
@@ -211,6 +224,19 @@ footer{border-top:1px solid var(--line);padding:30px 0;color:var(--muted);text-a
     <div class="feat"><div class="ic">🎮</div><h3>سهرة ألعاب</h3><p>سهرة أسبوعية كل خميس، وروم تلقى فيه تيم تلعب معه.</p></div>
     <div class="feat"><div class="ic">🤍</div><h3>للجميع</h3><p>مكان محترم بدون تفرقة ولا طائفية، وإدارة متواجدة ونظام تذاكر.</p></div>
   </div>
+</div></section>
+
+<section id="live"><div class="wrap">
+  <div class="sec-h"><div><h2>الفعاليات المباشرة 🔴</h2><p>صاحب السيرفر يفتح غرفة، والكل يدخل من نفس الرابط ويلعبون مع بعض لايف — بدون تسجيل</p></div>
+    <a class="btn gold sm" href="/live">🎮 دخول غرفة</a></div>
+  <div class="lgames">
+    <div class="lgame"><div class="ic">📞</div><h3>هاتف خربان</h3><p>تكتب جملة ← اللي بعدك يرسمها ← اللي بعده يخمّن... وبالأخير ألبوم يموّت ضحك 😂</p></div>
+    <div class="lgame"><div class="ic">🎨</div><h3>خمّن الرسمة</h3><p>واحد يرسم لايف والباقي يخمنون بالشات — الأسرع ياخذ نقاط أكثر</p></div>
+    <div class="lgame"><div class="ic">🧠</div><h3>مسابقة مباشرة</h3><p>أسئلة للكل بنفس اللحظة — الصح والأسرع يتصدّر</p></div>
+    <div class="lgame"><div class="ic">⚡</div><h3>سباق الأجوبة</h3><p>إيموجي، حروف، ألغاز، أمثال ورياضيات — اكتب قبل الكل</p></div>
+    <div class="lgame"><div class="ic">👆</div><h3>أسرع إصبع</h3><p>استنى الأخضر واضغط بأسرع ما يمكن!</p></div>
+  </div>
+  <div class="howto">📢 <b>كيف أدخل؟</b> تابع الشات العام بالسيرفر — لما تنفتح فعالية ينزل إعلان فيه زر <b>«🎟️ خذ رابطك»</b> (يربطك بحسابك عشان تاخذ <b>كوينز 🪙</b> لو فزت) أو زر <b>«دخول كزائر»</b>.</div>
 </div></section>
 
 <section id="events"><div class="wrap">
@@ -651,6 +677,18 @@ renderGames();
   const total = C.trivia.length + C.emoji.length + C.words.length + C.sentences.length + C.wyr.length + C.tf.length + C.riddles.length + C.proverbs.length + C.draw.length;
   $('#sItems').textContent = total + '+';
 })();
+async function checkLive() {
+  try {
+    const j = await fetch('/api/live/current').then((r) => r.json());
+    const bar = document.getElementById('liveBar');
+    if (j.room) {
+      bar.href = `/live?r=${encodeURIComponent(j.room.code)}`;
+      document.getElementById('liveTxt').textContent = `🔴 فعالية مباشرة الحين: ${j.room.title} — ${j.room.players} لاعب${j.room.phase === 'lobby' ? ' (في الانتظار)' : ''}`;
+      bar.classList.add('on');
+    } else bar.classList.remove('on');
+  } catch {}
+}
+checkLive(); setInterval(checkLive, 20000);
 api('/api/info').then((i) => {
   if (i.members) $('#sMembers').textContent = i.members;
   $('#sOnline').textContent = i.online ?? '—';
