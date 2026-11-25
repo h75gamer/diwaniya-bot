@@ -6,6 +6,7 @@ const path = require('path');
 const { ChannelType, PermissionFlagsBits, AttachmentBuilder, EmbedBuilder } = require('discord.js');
 const ED = require('./events-data');
 const WD = require('./web-data');
+const ROOMS = require('./rooms');
 
 const PORT = process.env.PORT || 3000;
 const INVITE = process.env.INVITE_URL || 'https://discord.gg/Jd7PhFDARx';
@@ -236,17 +237,22 @@ async function api(req, res, url) {
   return send(res, 404, { error: 'not found' });
 }
 
-let pageCache = null;
-function page() {
-  if (!pageCache || process.env.NODE_ENV === 'development') pageCache = fs.readFileSync(path.join(__dirname, 'web', 'index.html'));
-  return pageCache;
+const pageCache = {};
+function page(name = 'index.html') {
+  if (!pageCache[name] || process.env.NODE_ENV === 'development') pageCache[name] = fs.readFileSync(path.join(__dirname, 'web', name));
+  return pageCache[name];
 }
 
 function start() {
   http.createServer(async (req, res) => {
     try {
       const url = new URL(req.url, 'http://x');
+      if (url.pathname.startsWith('/api/live/')) { await ROOMS.handle(req, res, url); return; }
       if (url.pathname.startsWith('/api/')) return await api(req, res, url);
+      if (url.pathname === '/live' || url.pathname === '/live/') {
+        res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-cache' });
+        return res.end(page('live.html'));
+      }
       if (url.pathname === '/health') return send(res, 200, '🌙 بوت الديوانية شغّال', 'text/plain; charset=utf-8');
       if (url.pathname === '/' || url.pathname === '/index.html') {
         res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'public, max-age=60' });
