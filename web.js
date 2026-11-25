@@ -65,8 +65,35 @@ function guild() {
 }
 const textCh = (g, name) => g.channels.cache.find((c) => c.type === ChannelType.GuildText && c.name === name);
 
+// 🔒 IP الحقيقي: Render (Cloudflare) يحط cf-connecting-ip ولا يقدر الزائر يزوّره؛ وإلا آخر عنوان أضافه البروكسي
 function ipOf(req) {
-  return String(req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim();
+  const h = req.headers;
+  const ip = h['cf-connecting-ip'] || h['true-client-ip'] || String(h['x-forwarded-for'] || '').split(',').pop() || req.socket.remoteAddress || '';
+  return String(ip).trim().slice(0, 64);
+}
+// 🔒 هيدرات الأمان لكل الردود
+const CSP = [
+  "default-src 'self'", "script-src 'self' 'unsafe-inline'", "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+  "font-src https://fonts.gstatic.com", "img-src 'self' data: blob: https://cdn.discordapp.com https://media.discordapp.net",
+  "connect-src 'self'", "media-src 'self'", "object-src 'none'", "base-uri 'self'", "form-action 'self'", "frame-ancestors 'none'", 'upgrade-insecure-requests',
+].join('; ');
+function secHeaders(res) {
+  res.setHeader('Content-Security-Policy', CSP);
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=(), usb=()');
+  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+  res.setHeader('X-Powered-By', '');
+  res.removeHeader('X-Powered-By');
+}
+// 🔒 نتأكد إن الملف صورة فعلًا (مو ملف متنكّر)
+function isImage(buf, kind) {
+  if (kind === 'png') return buf.length > 8 && buf.readUInt32BE(0) === 0x89504e47;
+  if (kind === 'jpeg') return buf.length > 3 && buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff;
+  if (kind === 'webp') return buf.length > 12 && buf.toString('ascii', 0, 4) === 'RIFF' && buf.toString('ascii', 8, 12) === 'WEBP';
+  return false;
 }
 function limited(key, ms, max = 1) {
   const now = Date.now();
@@ -245,6 +272,7 @@ async function api(req, res, url) {
     if (!m) return send(res, 400, { error: 'الصورة ما وصلت صح' });
     const buf = Buffer.from(m[2], 'base64');
     if (buf.length < 500 || buf.length > 1100000) return send(res, 400, { error: 'حجم الرسمة غير مناسب' });
+    if (!isImage(buf, m[1])) return send(res, 400, { error: 'الصورة ما وصلت صح' });
     const g = guild();
     if (!g) return send(res, 503, { error: 'البوت يصحى، جرّب بعد شوي 🌙' });
     const name = cleanName(b.name);
@@ -276,9 +304,18 @@ function page(name = 'index.html') {
 }
 
 function start() {
-  http.createServer(async (req, res) => {
+  const server = http.createServer(async (req, res) => {
     try {
+      secHeaders(res);
+      if (!['GET', 'HEAD', 'POST'].includes(req.method)) { res.writeHead(405, { Allow: 'GET, HEAD, POST' }); return res.end(); }
+      if (req.url.length > 2048) { res.writeHead(414); return res.end(); }
       const url = new URL(req.url, 'http://x');
+      // 🔒 أي طلب POST لازم يكون من موقعنا نفسه (ضد CSRF) وبصيغة JSON
+      if (req.method === 'POST') {
+        const o = req.headers.origin;
+        if (o && o !== `https://${req.headers.host}` && o !== `http://${req.headers.host}`) return send(res, 403, { error: 'forbidden' });
+        if (!String(req.headers['content-type'] || '').startsWith('application/json')) return send(res, 415, { error: 'json only' });
+      }
       if (url.pathname.startsWith('/api/live/')) { await ROOMS.handle(req, res, url); return; }
       if (url.pathname.startsWith('/api/')) return await api(req, res, url);
       if (url.pathname === '/live' || url.pathname === '/live/') {
@@ -297,7 +334,11 @@ function start() {
       console.error('⚠️ web:', e.message);
       if (!res.headersSent) send(res, 500, { error: 'server' });
     }
-  }).listen(PORT, () => console.log(`🌐 موقع الديوانية شغّال على ${PORT}`));
+  });
+  server.requestTimeout = 30000;   // 🔒 ضد هجوم الاتصالات البطيئة
+  server.headersTimeout = 15000;
+  server.maxHeadersCount = 60;
+  server.listen(PORT, () => console.log(`🌐 موقع الديوانية شغّال على ${PORT}`));
 }
 
 function init(c) {
