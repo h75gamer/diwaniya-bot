@@ -29,12 +29,7 @@ const riyadhNow = () => new Date(new Date().toLocaleString('en-US', { timeZone: 
 const hhmm = (d) => `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
 const nospace = (s) => s.replace(/\s/g, '');
 
-// ───────── خادم ويب صغير (عشان Render) ─────────
-const PORT = process.env.PORT || 3000;
-http.createServer((req, res) => {
-  res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
-  res.end('🌙 بوت الديوانية شغّال');
-}).listen(PORT, () => console.log(`🌐 Web on ${PORT}`));
+// ───────── موقع الديوانية (web.js) يشتغل على رابط Render ─────────
 if (process.env.RENDER_EXTERNAL_URL) {
   setInterval(() => fetch(process.env.RENDER_EXTERNAL_URL).catch(() => {}), 10 * 60 * 1000);
 }
@@ -246,6 +241,7 @@ A.init(client);
 G.init(client);
 T.init(client);
 EV.init(client);
+require('./web').init(client);
 
 client.once('clientReady', async () => {
   console.log(`✅ ${client.user.tag} شغّال!`);
