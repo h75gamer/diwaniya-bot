@@ -7,6 +7,13 @@
 <meta name="description" content="ديوانية: مجتمع عربي على ديسكورد للسوالف والألعاب والقرآن. العب مئات الفعاليات بدون تسجيل: رسم، مسابقات، ألغاز، وأكثر.">
 <meta property="og:title" content="ديوانية 🌙 | Diwaniya">
 <meta property="og:description" content="مجتمع عربي للسوالف والألعاب — وفعاليات بدون تسجيل دخول">
+<link rel="icon" type="image/png" sizes="64x64" href="/favicon.png">
+<link rel="apple-touch-icon" href="/icon.png">
+<meta name="theme-color" content="#0d0a1f">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://diwaniya-bot-1.onrender.com/">
+<meta property="og:image" content="https://diwaniya-bot-1.onrender.com/icon.png">
+<meta name="twitter:card" content="summary">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
@@ -52,7 +59,7 @@ nav .links a:hover{color:var(--text);background:var(--card)}
 .hero .logo img{width:100%;height:100%;object-fit:cover}
 .hero h1{font-size:clamp(34px,6vw,60px);font-weight:900;margin-top:18px;line-height:1.2}
 .hero h1 span{background:linear-gradient(90deg,var(--gold2),var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
-.hero p.sub{color:var(--muted);font-size:clamp(17px,2.2vw,21px);max-width:680px;margin:14px auto 26px}
+.hero p.sub{color:var(--muted);font-size:clamp(17px,2.2vw,21px);max-width:640px;margin:14px auto 26px;text-wrap:balance;line-height:1.75}
 .hero .cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
 .stats{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:34px}
 .stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 22px;min-width:130px}
@@ -65,7 +72,8 @@ section{padding:46px 0}
 .sec-h h2{font-size:30px;font-weight:900}
 .sec-h p{color:var(--muted)}
 .features{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
-.feat{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px}
+.feat{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px;transition:transform .18s,border-color .18s,box-shadow .18s}
+.feat:hover,.lgame:hover{transform:translateY(-4px);border-color:#5a4bb0;box-shadow:0 14px 34px #0006}
 .feat .ic{font-size:32px}
 .feat h3{font-size:19px;margin:6px 0 4px}
 .feat p{color:var(--muted);font-size:15px}
@@ -168,7 +176,13 @@ canvas#cv{width:100%;aspect-ratio:4/3;background:#fff;border-radius:16px;touch-a
 .bead{width:200px;height:200px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#3c2f8f,#191247);border:3px solid var(--gold);color:var(--gold2);font-size:64px;font-weight:900;box-shadow:0 18px 50px #f5b94233}
 .bead:active{transform:scale(.96)}
 
-footer{border-top:1px solid var(--line);padding:30px 0;color:var(--muted);text-align:center;margin-top:30px}
+footer{border-top:1px solid var(--line);padding:34px 0 26px;color:var(--muted);text-align:center;margin-top:30px;background:linear-gradient(180deg,transparent,#0a0818)}
+footer .fbrand{display:flex;align-items:center;justify-content:center;gap:10px;font-weight:900;font-size:20px;color:var(--text)}
+footer .fbrand img{width:40px;height:40px;border-radius:12px}
+footer .flinks{display:flex;gap:18px;justify-content:center;flex-wrap:wrap;margin:14px 0}
+footer .flinks a{color:var(--muted);font-weight:700}
+footer .flinks a:hover{color:var(--gold2)}
+footer small{opacity:.7}
 .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(120px);background:var(--card2);border:1px solid var(--gold);padding:12px 20px;border-radius:14px;font-weight:800;z-index:200;transition:.3s;max-width:90vw}
 .toast.show{transform:translateX(-50%) translateY(0)}
 
@@ -179,7 +193,7 @@ footer{border-top:1px solid var(--line);padding:30px 0;color:var(--muted);text-a
 @keyframes lp{50%{opacity:.3}}
 .livebar .go{margin-inline-start:auto;background:var(--gold);color:#1b1300;border-radius:11px;padding:6px 14px;white-space:nowrap}
 .lgames{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
-.lgame{background:linear-gradient(160deg,#2a1840,var(--card));border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.lgame{background:linear-gradient(160deg,#2a1840,var(--card));border:1px solid var(--line);border-radius:var(--r);padding:18px;transition:transform .18s,border-color .18s,box-shadow .18s}
 .lgame .ic{font-size:36px}.lgame h3{font-size:18px;margin:4px 0}.lgame p{color:var(--muted);font-size:14.5px}
 .howto{margin-top:16px;background:var(--card);border:1px dashed var(--line);border-radius:var(--r);padding:16px 20px;color:var(--muted);font-size:15px}
 .howto b{color:var(--text)}
@@ -223,6 +237,8 @@ footer{border-top:1px solid var(--line);padding:30px 0;color:var(--muted);text-a
     <div class="feat"><div class="ic">🆙</div><h3>مستويات ورتب</h3><p>كل ما تتفاعل تطلع مستوى وتاخذ رتب، ومكافأة يومية 🎁</p></div>
     <div class="feat"><div class="ic">🎮</div><h3>سهرة ألعاب</h3><p>سهرة أسبوعية كل خميس، وروم تلقى فيه تيم تلعب معه.</p></div>
     <div class="feat"><div class="ic">🤍</div><h3>للجميع</h3><p>مكان محترم بدون تفرقة ولا طائفية، وإدارة متواجدة ونظام تذاكر.</p></div>
+    <div class="feat"><div class="ic">🏦</div><h3>بنك وفلوس</h3><p>اشتغل كل ساعة، ودّع فلوسك تزيد كل يوم، واشترِ رتب من المتجر 🪙</p></div>
+    <div class="feat"><div class="ic">🚻</div><h3>أقسام خاصة</h3><p>روم للأولاد وروم للبنات، ومشرفين يحافظون على الاحترام.</p></div>
   </div>
 </div></section>
 
@@ -258,7 +274,10 @@ footer{border-top:1px solid var(--line);padding:30px 0;color:var(--muted);text-a
 </div></section>
 
 <footer><div class="wrap">
-  صُنع بحب لمجتمع <b>ديوانية 🌙</b> — <a href="https://discord.gg/Jd7PhFDARx" id="joinFoot" target="_blank" rel="noopener" style="color:var(--gold2)">انضم لنا في ديسكورد</a>
+  <div class="fbrand"><img src="/icon.png" alt="" onerror="this.remove()">ديوانية 🌙</div>
+  <div class="flinks"><a href="#about">عن السيرفر</a><a href="/live">🔴 الفعاليات المباشرة</a><a href="#events">الفعاليات</a><a href="#gallery">المعرض</a><a href="#boards">المتصدرين</a></div>
+  <a class="btn gold sm" href="https://discord.gg/Jd7PhFDARx" id="joinFoot" target="_blank" rel="noopener">💬 انضم لنا في ديسكورد</a>
+  <p style="margin-top:16px"><small>صُنع بحب لمجتمع ديوانية — <span id="yr">2026</span></small></p>
 </div></footer>
 
 <div class="modal" id="modal"><div class="panel">
@@ -689,6 +708,7 @@ async function checkLive() {
   } catch {}
 }
 checkLive(); setInterval(checkLive, 20000);
+document.getElementById('yr').textContent = new Date().getFullYear();
 api('/api/info').then((i) => {
   if (i.members) $('#sMembers').textContent = i.members;
   $('#sOnline').textContent = i.online ?? '—';
