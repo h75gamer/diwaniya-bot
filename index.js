@@ -16,6 +16,9 @@ const A = require('./ai');
 const G = require('./growth');
 const T = require('./tickets');
 const EV = require('./events');
+const ECO = require('./economy');
+const LV = require('./live');
+const GN = require('./gender');
 
 const TOKEN = process.env.DISCORD_TOKEN;
 const GUILD_ID = process.env.GUILD_ID;
@@ -227,7 +230,7 @@ const commands = [
   new SlashCommandBuilder().setName('مين').setDescription('معلومات عن عضو 👤')
     .addUserOption((o) => o.setName('العضو').setDescription('اختر العضو')),
   new SlashCommandBuilder().setName('مساعدة').setDescription('قائمة أوامر بوت الديوانية 📜'),
-].map((c) => c.toJSON()).concat(C.commands, G.commands, EV.commands);
+].map((c) => c.toJSON()).concat(C.commands, G.commands, EV.commands, ECO.commands, LV.commands, GN.commands);
 
 const client = new Client({
   intents: [
@@ -241,6 +244,9 @@ A.init(client);
 G.init(client);
 T.init(client);
 EV.init(client);
+ECO.init(client);
+LV.init(client);
+GN.init(client);
 require('./web').init(client);
 
 client.once('clientReady', async () => {
@@ -267,6 +273,9 @@ client.on('interactionCreate', async (i) => {
     if (await G.handle(i)) return;
     if (await T.handle(i)) return;
     if (await EV.handle(i)) return;
+    if (await ECO.handle(i)) return;
+    if (await LV.handle(i)) return;
+    if (await GN.handle(i)) return;
     // اقتراحات أسماء السور
     if (i.isAutocomplete()) {
       const q = String(i.options.getFocused() || '').trim();
@@ -416,6 +425,9 @@ client.on('interactionCreate', async (i) => {
             { name: '🎮 سهرة الألعاب', value: '`/سهرة` موعد السهرة الأسبوعية وتفعيل التنبيه' },
             { name: '🎫 التذاكر', value: 'تحتاج الإدارة؟ افتح تذكرة من روم «فتح-تذكرة»' },
             { name: '🎯 الفعاليات والمستويات', value: '`/مستواي` `/المتصدرين` `/يومي` `/اعتراف` — وتحديات يومية في روم «تحديات» ولعبة العد' },
+            { name: '🪙 الفلوس والبنك', value: '`/رصيدي` • `/عمل` كل ساعة • `/بنك` إيداع وسحب وفايدة يومية • `/تحويل` • `/الأغنى` • `/متجر` رتب' },
+            { name: '🌐 الموقع والفعاليات المباشرة', value: `${(process.env.SITE_URL || process.env.RENDER_EXTERNAL_URL || 'https://diwaniya-bot-1.onrender.com').replace(/\/$/, '')} — ألعاب ورسم وفعاليات لايف بدون تسجيل` },
+            { name: '🚻 الأقسام', value: 'روم خاص للأولاد وروم خاص للبنات • `/بلاغ` لأي مشكلة توصل للإشراف' },
             { name: '⏰ تلقائي', value: 'إذاعة قرآن دايمة في روم القرآن • تنبيه بكل صلاة (أم القرى والجعفري) • أذكار الصباح والمساء • آية اليوم • سؤال اليوم 9 مساءً • ترحيب ودليل للأعضاء الجدد • نشرة يومية وأسبوعية وشهرية' },
           );
         return i.reply({ embeds: [e] });
