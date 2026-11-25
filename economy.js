@@ -11,7 +11,7 @@ const MAX = 1000000;
 const COLOR = 0xf1c40f;
 
 let client = null;
-let data = { bal: {}, shop: [], log: [] };
+let data = { bal: {}, bank: {}, work: {}, shop: [], log: [], lastInterest: null };
 let loaded = false;
 let dirty = false;
 let saving = false;
@@ -40,7 +40,37 @@ function add(id, n, reason = '') {
   return data.bal[id];
 }
 function set(id, n) { data.bal[id] = Math.max(0, Math.round(n)); dirty = true; return data.bal[id]; }
-function top(n = 10) { return Object.entries(data.bal).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]).slice(0, n); }
+const bankOf = (id) => data.bank[id] || 0;
+const total = (id) => get(id) + bankOf(id);
+function top(n = 10) {
+  const ids = new Set([...Object.keys(data.bal), ...Object.keys(data.bank)]);
+  return [...ids].map((id) => [id, total(id)]).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]).slice(0, n);
+}
+// ───────── البنك 🏦 ─────────
+const INTEREST = 0.02;      // 2% يوميًا
+const INTEREST_MAX = 100;   // حد أقصى للفايدة اليومية
+const WORK_CD = 60 * 60000; // /عمل كل ساعة
+const JOBS = [
+  ['☕', 'سويت قهوة للديوانية'], ['🚗', 'غسلت سيارات الحارة'], ['📦', 'وصّلت طلبات'], ['💻', 'برمجت موقع لعميل'],
+  ['🎨', 'صممت شعار لمتجر'], ['🍔', 'اشتغلت في مطعم برقر'], ['📚', 'درّست طالب رياضيات'], ['🛒', 'رتبت رفوف السوبرماركت'],
+  ['🎮', 'جربت لعبة جديدة لشركة'], ['🌴', 'سقيت نخل المزرعة'], ['🔧', 'صلّحت مكيف'], ['🎤', 'قدّمت حفل'],
+  ['📸', 'صوّرت مناسبة'], ['🧵', 'خيّطت ثوب'], ['🐪', 'رعيت الإبل'], ['🏗️', 'ساعدت في بناء بيت'],
+];
+const dayKey = () => new Date(Date.now() + 3 * 3600000).toISOString().slice(0, 10);
+function payInterest() {
+  if (!loaded) return;
+  const d = dayKey();
+  if (data.lastInterest === d) return;
+  let paid = 0;
+  if (data.lastInterest) {
+    for (const [id, b] of Object.entries(data.bank)) {
+      const x = Math.min(INTEREST_MAX, Math.floor(b * INTEREST));
+      if (x > 0) { data.bank[id] = b + x; paid += x; }
+    }
+  }
+  data.lastInterest = d; dirty = true;
+  if (paid) console.log(`🏦 فوايد البنك اليوم: ${paid}`);
+}
 
 // ───────── الحفظ ─────────
 async function dataChannel(g) {
@@ -91,6 +121,13 @@ const commands = [
     .addUserOption((o) => o.setName('عضو').setDescription('لمين؟').setRequired(true))
     .addIntegerOption((o) => o.setName('كمية').setDescription('كم؟').setRequired(true).setMinValue(1).setMaxValue(MAX)),
   new SlashCommandBuilder().setName('متجر').setDescription(`متجر الديوانية — اشترِ رتب بالـ${COIN_NAME} 🛒`),
+  new SlashCommandBuilder().setName('بنك').setDescription('🏦 بنك الديوانية — إيداع وسحب وفوايد يومية')
+    .addSubcommand((s) => s.setName('كشف').setDescription('كشف حسابك في البنك'))
+    .addSubcommand((s) => s.setName('ايداع').setDescription('تودع من محفظتك للبنك (فاضي = الكل)')
+      .addIntegerOption((o) => o.setName('كمية').setDescription('كم؟ (اتركه فاضي تودع الكل)').setMinValue(1).setMaxValue(MAX * 100)))
+    .addSubcommand((s) => s.setName('سحب').setDescription('تسحب من البنك لمحفظتك (فاضي = الكل)')
+      .addIntegerOption((o) => o.setName('كمية').setDescription('كم؟ (اتركه فاضي تسحب الكل)').setMinValue(1).setMaxValue(MAX * 100))),
+  new SlashCommandBuilder().setName('عمل').setDescription(`💼 اشتغل واكسب ${COIN_NAME} (كل ساعة)`),
   new SlashCommandBuilder().setName('عملات').setDescription('التحكم بعملات السيرفر (لصاحب السيرفر بس) 👑')
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .addSubcommand((s) => s.setName('اعط').setDescription('تعطي عضو كوينز')
@@ -135,7 +172,7 @@ async function handle(i) {
     const member = await g.members.fetch(i.user.id).catch(() => null);
     if (!member) return true;
     if (member.roles.cache.has(role.id)) return i.reply({ content: `عندك رتبة ${role} من قبل 😉`, flags: MessageFlags.Ephemeral, allowedMentions: { parse: [] } }).then(() => true);
-    if (get(i.user.id) < item.price) return i.reply({ content: `رصيدك ${fmt(get(i.user.id))} وما يكفي 😅 تحتاج ${fmt(item.price)}`, flags: MessageFlags.Ephemeral }).then(() => true);
+    if (get(i.user.id) < item.price) return i.reply({ content: `محفظتك ${fmt(get(i.user.id))} وما تكفي 😅 تحتاج ${fmt(item.price)}${bankOf(i.user.id) ? `\n🏦 عندك ${fmt(bankOf(i.user.id))} بالبنك — اسحب بـ \`/بنك سحب\`` : ''}`, flags: MessageFlags.Ephemeral }).then(() => true);
     try {
       await member.roles.add(role, 'شراء من المتجر');
     } catch {
@@ -153,7 +190,7 @@ async function handle(i) {
     const u = i.options.getUser('عضو') || i.user;
     const rank = top(100000).findIndex(([id]) => id === u.id) + 1;
     await i.reply({ embeds: [new EmbedBuilder().setColor(COLOR).setAuthor({ name: u.displayName || u.username, iconURL: u.displayAvatarURL() })
-      .setTitle(`${COIN} الرصيد`).setDescription(`${fmt(get(u.id))}\n🏅 الترتيب: **${rank ? `#${rank}` : '—'}**\n\nتجمع ${COIN_NAME} من الفعاليات 🎯 والتحديات و \`/يومي\`، وتصرفها في \`/متجر\` 🛒`)] });
+      .setTitle(`${COIN} الرصيد`).setDescription(`👛 المحفظة: ${fmt(get(u.id))}\n🏦 البنك: ${fmt(bankOf(u.id))}\n💰 المجموع: ${fmt(total(u.id))}\n🏅 الترتيب: **${rank ? `#${rank}` : '—'}**\n\nتجمع ${COIN_NAME} من \`/عمل\` والفعاليات 🎯 والتحديات و \`/يومي\`\nحطها في \`/بنك\` تزيد ${Math.round(INTEREST * 100)}% كل يوم 📈 • واصرفها في \`/متجر\` 🛒`)] });
     return true;
   }
   if (n === 'الأغنى') {
@@ -167,7 +204,7 @@ async function handle(i) {
     const u = i.options.getUser('عضو');
     const amt = i.options.getInteger('كمية');
     if (u.bot || u.id === i.user.id) return i.reply({ content: 'ما يصير 😅 اختار عضو ثاني', flags: MessageFlags.Ephemeral }).then(() => true);
-    if (get(i.user.id) < amt) return i.reply({ content: `رصيدك ${fmt(get(i.user.id))} وما يكفي 😅`, flags: MessageFlags.Ephemeral }).then(() => true);
+    if (get(i.user.id) < amt) return i.reply({ content: `محفظتك ${fmt(get(i.user.id))} وما تكفي 😅${bankOf(i.user.id) ? ' — اسحب من البنك أول بـ `/بنك سحب`' : ''}`, flags: MessageFlags.Ephemeral }).then(() => true);
     add(i.user.id, -amt, `تحويل لـ ${u.id}`);
     add(u.id, amt, `تحويل من ${i.user.id}`);
     await i.reply({ content: `💸 ${i.user} حوّل ${fmt(amt)} لـ ${u}`, allowedMentions: { users: [u.id] } });
@@ -176,6 +213,42 @@ async function handle(i) {
   if (n === 'متجر') {
     await i.reply(shopEmbed(g));
     return true;
+  }
+  if (n === 'عمل') {
+    const last = data.work[i.user.id] || 0;
+    const left = last + WORK_CD - Date.now();
+    if (left > 0) return i.reply({ content: `😮‍💨 تعبان! ارتاح شوي وارجع اشتغل <t:${Math.floor((last + WORK_CD) / 1000)}:R>`, flags: MessageFlags.Ephemeral }).then(() => true);
+    const [em, job] = JOBS[Math.floor(Math.random() * JOBS.length)];
+    const pay = 20 + Math.floor(Math.random() * 41);
+    data.work[i.user.id] = Date.now();
+    add(i.user.id, pay);
+    await i.reply({ embeds: [new EmbedBuilder().setColor(COLOR).setDescription(`${em} ${i.user} ${job} وأخذ ${fmt(pay)}\n👛 محفظتك: ${fmt(get(i.user.id))}\n\n💡 أودعها بـ \`/بنك ايداع\` عشان تزيد كل يوم 📈`)] });
+    return true;
+  }
+  if (n === 'بنك') {
+    const sub = i.options.getSubcommand();
+    const id = i.user.id;
+    if (sub === 'كشف') {
+      const daily = Math.min(INTEREST_MAX, Math.floor(bankOf(id) * INTEREST));
+      await i.reply({ embeds: [new EmbedBuilder().setColor(0x2ecc71).setTitle('🏦 بنك الديوانية — كشف حساب')
+        .setDescription(`👛 المحفظة: ${fmt(get(id))}\n🏦 رصيد البنك: ${fmt(bankOf(id))}\n💰 المجموع: ${fmt(total(id))}\n\n📈 الفايدة: **${Math.round(INTEREST * 100)}%** يوميًا (حدها ${INTEREST_MAX} ${COIN})\nفايدتك بكرة: ${fmt(daily)}\n\n\`/بنك ايداع\` • \`/بنك سحب\``)], flags: MessageFlags.Ephemeral });
+      return true;
+    }
+    const want = i.options.getInteger('كمية');
+    if (sub === 'ايداع') {
+      const amt = want ?? get(id);
+      if (amt <= 0 || get(id) < amt) return i.reply({ content: `محفظتك ${fmt(get(id))} — ما تكفي 😅`, flags: MessageFlags.Ephemeral }).then(() => true);
+      data.bal[id] = get(id) - amt; data.bank[id] = bankOf(id) + amt; dirty = true;
+      await i.reply({ content: `🏦 أودعت ${fmt(amt)}\n👛 المحفظة: ${fmt(get(id))} • 🏦 البنك: ${fmt(bankOf(id))}`, flags: MessageFlags.Ephemeral });
+      return true;
+    }
+    if (sub === 'سحب') {
+      const amt = want ?? bankOf(id);
+      if (amt <= 0 || bankOf(id) < amt) return i.reply({ content: `رصيد البنك ${fmt(bankOf(id))} — ما يكفي 😅`, flags: MessageFlags.Ephemeral }).then(() => true);
+      data.bank[id] = bankOf(id) - amt; data.bal[id] = get(id) + amt; dirty = true;
+      await i.reply({ content: `💸 سحبت ${fmt(amt)}\n👛 المحفظة: ${fmt(get(id))} • 🏦 البنك: ${fmt(bankOf(id))}`, flags: MessageFlags.Ephemeral });
+      return true;
+    }
   }
   if (n === 'عملات') {
     if (!isOwner(i)) return i.reply({ content: '👑 هذا الأمر لصاحب السيرفر بس.', flags: MessageFlags.Ephemeral }).then(() => true);
@@ -243,10 +316,11 @@ function init(c) {
   client.once('clientReady', async () => {
     const g = getGuild();
     if (g) await load(g);
-    setInterval(() => save().catch(() => {}), 60 * 1000);
+    payInterest();
+    setInterval(() => { payInterest(); save().catch(() => {}); }, 60 * 1000);
     console.log('🪙 نظام العملات جاهز');
   });
   process.on('SIGTERM', () => { save(true).catch(() => {}); });
 }
 
-module.exports = { init, handle, commands, get, add, set, top, fmt, isOwner, COIN, COIN_NAME };
+module.exports = { init, handle, commands, get, add, set, top, fmt, isOwner, bankOf, total, COIN, COIN_NAME };
