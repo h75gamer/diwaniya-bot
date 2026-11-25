@@ -4,6 +4,7 @@ const {
   SlashCommandBuilder, MessageFlags, AttachmentBuilder, ModalBuilder, TextInputBuilder, TextInputStyle,
 } = require('discord.js');
 const D = require('./events-data');
+const ECO = require('./economy');
 
 const TZ = 'Asia/Riyadh';
 const COLOR = 0x9b59b6;
@@ -32,6 +33,7 @@ const CHAMP_ROLE = '👑 بطل الأسبوع';
 const POINTS = 10;      // نقاط الفوز بالتحدي
 const WIN_XP = 50;      // XP إضافي للفايز
 const PLAY_XP = 5;      // XP للمشاركة في «لو خيروك»
+const WIN_COINS = 20;   // كوينز الفوز بالتحدي
 
 let client = null;
 let data = { xp: {}, week: {}, weekStart: '', daily: {}, count: { n: 0, last: null, best: 0 }, confN: 0, sent: {} };
@@ -248,11 +250,12 @@ async function winChallenge(member, channel) {
   if (!ch) return;
   await endChallenge('win');
   data.week[member.id] = (data.week[member.id] || 0) + POINTS;
+  ECO.add(member.id, WIN_COINS, 'فوز بتحدي يومي');
   dirty = true;
   await channel.send({
     content: `${member}`,
     embeds: [new EmbedBuilder().setColor(0x2ecc71).setTitle('🏆 عندنا فايز!')
-      .setDescription(`كفو ${member} 👏 الجواب: **${ch.answerText}**\n+${POINTS} نقاط و +${WIN_XP} XP\nنقاطك هالأسبوع: **${data.week[member.id]}**`)],
+      .setDescription(`كفو ${member} 👏 الجواب: **${ch.answerText}**\n+${POINTS} نقاط و +${WIN_XP} XP و +${WIN_COINS} ${ECO.COIN}\nنقاطك هالأسبوع: **${data.week[member.id]}**`)],
     allowedMentions: { users: [member.id] },
   }).catch(() => {});
   await addXp(member, WIN_XP);
@@ -384,7 +387,7 @@ async function ensureChannels(g) {
             '🧠 أسئلة ثقافية • ✅❌ صح ولا خطأ • 🤔 خمّن الإيموجي',
             '🔤 رتّب الحروف • ⌨️ أسرع كاتب • 🧮 رياضيات • 🤷 لو خيروك',
             '',
-            `🏆 الفايز ياخذ **${POINTS} نقاط** + **${WIN_XP} XP**`,
+            `🏆 الفايز ياخذ **${POINTS} نقاط** + **${WIN_XP} XP** + **${WIN_COINS} ${ECO.COIN}**`,
             `👑 كل **جمعة 9 بالليل** يتتوّج صاحب أعلى نقاط بـ رتبة **${CHAMP_ROLE}**`,
             '📊 `/المتصدرين` تشوف الترتيب',
           ].join('\n'))] }).then((m) => m.pin().catch(() => {})).catch(() => {});
@@ -443,9 +446,11 @@ async function handle(i) {
       d.last = today;
       data.daily[i.user.id] = d;
       const amount = Math.min(50 + (d.streak - 1) * 10, 150);
+      const coins = Math.min(20 + (d.streak - 1) * 5, 60);
+      ECO.add(i.user.id, coins, 'المكافأة اليومية');
       dirty = true;
       await i.reply({ embeds: [new EmbedBuilder().setColor(0x2ecc71).setTitle('🎁 المكافأة اليومية')
-        .setDescription(`أخذت **+${amount} XP** ✨\n🔥 سلسلتك: **${d.streak}** يوم${d.streak > 1 ? ' ورا بعض' : ''}\nكل يوم تستمر تزيد المكافأة (لين 150 XP)`)] });
+        .setDescription(`أخذت **+${amount} XP** ✨ و ${ECO.fmt(coins)}\n🔥 سلسلتك: **${d.streak}** يوم${d.streak > 1 ? ' ورا بعض' : ''}\nكل يوم تستمر تزيد المكافأة (لين 150 XP و 60 ${ECO.COIN})`)] });
       const member = await g.members.fetch(i.user.id).catch(() => null);
       await addXp(member, amount);
       return true;
