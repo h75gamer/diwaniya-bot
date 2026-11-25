@@ -19,6 +19,7 @@ const EV = require('./events');
 const ECO = require('./economy');
 const LV = require('./live');
 const GN = require('./gender');
+const ST = require('./stickers');
 
 const TOKEN = process.env.DISCORD_TOKEN;
 const GUILD_ID = process.env.GUILD_ID;
@@ -230,7 +231,7 @@ const commands = [
   new SlashCommandBuilder().setName('مين').setDescription('معلومات عن عضو 👤')
     .addUserOption((o) => o.setName('العضو').setDescription('اختر العضو')),
   new SlashCommandBuilder().setName('مساعدة').setDescription('قائمة أوامر بوت الديوانية 📜'),
-].map((c) => c.toJSON()).concat(C.commands, G.commands, EV.commands, ECO.commands, LV.commands, GN.commands);
+].map((c) => c.toJSON()).concat(C.commands, G.commands, EV.commands, ECO.commands, LV.commands, GN.commands, ST.commands);
 
 const client = new Client({
   intents: [
@@ -247,6 +248,7 @@ EV.init(client);
 ECO.init(client);
 LV.init(client);
 GN.init(client);
+ST.init(client);
 require('./web').init(client);
 
 client.once('clientReady', async () => {
@@ -276,6 +278,7 @@ client.on('interactionCreate', async (i) => {
     if (await ECO.handle(i)) return;
     if (await LV.handle(i)) return;
     if (await GN.handle(i)) return;
+    if (await ST.handle(i)) return;
     // اقتراحات أسماء السور
     if (i.isAutocomplete()) {
       const q = String(i.options.getFocused() || '').trim();
