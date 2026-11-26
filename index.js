@@ -23,6 +23,7 @@ const ST = require('./stickers');
 const PL = require('./polls');
 const SH = require('./shop');
 const MD = require('./mod');
+const PN = require('./panels');
 
 const TOKEN = process.env.DISCORD_TOKEN;
 const GUILD_ID = process.env.GUILD_ID;
@@ -255,6 +256,7 @@ ST.init(client);
 PL.init(client);
 SH.init(client);
 MD.init(client);
+PN.init(client);
 require('./web').init(client);
 
 client.once('clientReady', async () => {
@@ -281,13 +283,14 @@ client.on('interactionCreate', async (i) => {
     if (await G.handle(i)) return;
     if (await T.handle(i)) return;
     if (await EV.handle(i)) return;
-    if (await ECO.handle(i)) return;
+    if (await ECO.handle(i)) { if (i.isChatInputCommand?.() && i.commandName === 'عملات') PN.refresh()?.catch?.(() => {}); return; }
     if (await LV.handle(i)) return;
     if (await GN.handle(i)) return;
     if (await ST.handle(i)) return;
     if (await PL.handle(i)) return;
     if (await SH.handle(i)) return;
     if (await MD.handle(i)) return;
+    if (await PN.handle(i)) return;
     // اقتراحات أسماء السور
     if (i.isAutocomplete()) {
       const q = String(i.options.getFocused() || '').trim();
