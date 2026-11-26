@@ -20,6 +20,7 @@ const ECO = require('./economy');
 const LV = require('./live');
 const GN = require('./gender');
 const ST = require('./stickers');
+const PL = require('./polls');
 
 const TOKEN = process.env.DISCORD_TOKEN;
 const GUILD_ID = process.env.GUILD_ID;
@@ -231,7 +232,7 @@ const commands = [
   new SlashCommandBuilder().setName('مين').setDescription('معلومات عن عضو 👤')
     .addUserOption((o) => o.setName('العضو').setDescription('اختر العضو')),
   new SlashCommandBuilder().setName('مساعدة').setDescription('قائمة أوامر بوت الديوانية 📜'),
-].map((c) => c.toJSON()).concat(C.commands, G.commands, EV.commands, ECO.commands, LV.commands, GN.commands, ST.commands);
+].map((c) => c.toJSON()).concat(C.commands, G.commands, EV.commands, ECO.commands, LV.commands, GN.commands, ST.commands, PL.commands);
 
 const client = new Client({
   intents: [
@@ -249,6 +250,7 @@ ECO.init(client);
 LV.init(client);
 GN.init(client);
 ST.init(client);
+PL.init(client);
 require('./web').init(client);
 
 client.once('clientReady', async () => {
@@ -279,6 +281,7 @@ client.on('interactionCreate', async (i) => {
     if (await LV.handle(i)) return;
     if (await GN.handle(i)) return;
     if (await ST.handle(i)) return;
+    if (await PL.handle(i)) return;
     // اقتراحات أسماء السور
     if (i.isAutocomplete()) {
       const q = String(i.options.getFocused() || '').trim();
@@ -422,6 +425,7 @@ client.on('interactionCreate', async (i) => {
             { name: '📖 القرآن', value: '`/قران` سورة بصوت قارئ تختاره\n`/اذاعة` إذاعة قرآن 24 ساعة\n`/ايقاف` إيقاف (للمشرفين)\n`/اية` آية عشوائية' },
             { name: '📿 أذكار', value: '`/ذكر` • `/دعاء` • `/مسبحة` • `/مواقيت`' },
             { name: '💬 سوالف', value: '`/سالفة` • `/تحدي` • `/لو-خيروك` • `/قهوة`' },
+            { name: '🗳️ تصويت وتسلية', value: '`/تصويت` بأزرار • `/اختار` البوت يختار لك • `/ذكرني` • `/مبارزة` حجرة ورقة مقص على عملات • `/عجلة` عجلة الحظ كل يوم' },
             { name: '🛠️ أخرى', value: '`/اقتراح` • `/معلومات-السيرفر` • `/مين`' },
             { name: '📰 المجتمع', value: '`/دليل` دليل السيرفر • `/ملخص` نشرة اليوم/الأسبوع/الشهر • `/احصائياتي` تفاعلك وترتيبك' },
             { name: '🤖 ذكاء الديوانية', value: 'اكتب في روم «سولف-مع-الذكاء» أو منشن البوت بأي روم ويسولف معك بلهجتنا' },
