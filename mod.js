@@ -99,23 +99,25 @@ async function punish(m, v) {
   const member = await g.members.fetch(m.author.id).catch(() => null);
   let action = '⚠️ تحذير';
   let deleted = false;
-  if (lvl >= 2) { deleted = await m.delete().then(() => true).catch(() => false); }
+  const full = m.content; // ناخذ النص كامل قبل الحذف
+  // أي رسالة مخالفة تنحذف (حتى التحذير)
+  deleted = await m.delete().then(() => true).catch((e) => { console.error('⚠️ mod delete:', e.message); return false; });
   if (mins && member) {
     const ok = await member.timeout(mins * 60000, `رقابة الديوانية: ${v.reason}`).then(() => true).catch((e) => { console.error('⚠️ timeout:', e.message); return false; });
     action = ok ? `🔇 كتم ${mins >= 60 ? `${mins / 60} ساعة` : `${mins} دقيقة`}` : '⚠️ تحذير (ما قدرت أكتم — ناقص صلاحية)';
   }
   // تنبيه في الروم (يختفي بعد 15 ثانية) + خاص للعضو
   const note = lvl === 1 && !mins
-    ? `⚠️ ${m.author} انتبه لكلامك — هذا تحذير ${n}/3 🙏 (السب ممنوع حتى لو زعلان)`
+    ? `⚠️ ${m.author} انحذفت رسالتك — انتبه لكلامك، هذا تحذير ${n}/3 🙏 (السب ممنوع حتى لو زعلان)`
     : `🔇 ${m.author} انكتمت ${mins >= 60 ? `${mins / 60} ساعة` : `${mins} دقيقة`} بسبب: ${v.reason}`;
   m.channel.send({ content: note, allowedMentions: { users: [m.author.id] } }).then((x) => setTimeout(() => x.delete().catch(() => {}), 15000)).catch(() => {});
-  m.author.send(`🛡️ رقابة الديوانية: ${action}\nالسبب: ${v.reason}\nرسالتك: «${m.content.slice(0, 300)}»\nإذا تشوف إنه غلط كلّم الإدارة من التذاكر 🎫`).catch(() => {});
+  m.author.send(`🛡️ رقابة الديوانية: ${action}\nالسبب: ${v.reason}\nرسالتك: «${full.slice(0, 300)}»\nإذا تشوف إنه غلط كلّم الإدارة من التذاكر 🎫`).catch(() => {});
   // السجل لصاحب السيرفر
-  const entry = { t: Date.now(), u: m.author.id, tag: m.author.tag, ch: m.channel.id, text: m.content.slice(0, 500), lvl, reason: v.reason, word: v.word || '', action };
+  const entry = { t: Date.now(), u: m.author.id, tag: m.author.tag, ch: m.channel.id, text: full.slice(0, 2000), lvl, reason: v.reason, word: v.word || '', action };
   data.log.push(entry); if (data.log.length > 300) data.log = data.log.slice(-300); mark();
   const color = lvl === 1 ? 0xf1c40f : lvl === 2 ? 0xe67e22 : 0xe74c3c;
   const e = new EmbedBuilder().setColor(color).setTitle(`🛡️ مخالفة مستوى ${lvl} — ${action}`)
-    .setDescription(`**العضو:** ${m.author} (${m.author.tag})\n**الروم:** ${m.channel}\n**الرسالة:** ${m.content.slice(0, 900) || '—'}\n**السبب:** ${v.reason}${v.word ? `\n**الكلمة:** ||${v.word}||` : ''}\n**عدد مخالفاته (آخر ${STRIKE_DAYS} أيام):** ${data.strikes[m.author.id].length}${deleted ? '\n🗑️ انحذفت الرسالة' : `\n[🔗 الرسالة](${m.url})`}`)
+    .setDescription(`**العضو:** ${m.author} (${m.author.tag})\n**الروم:** ${m.channel}\n**السبب:** ${v.reason}${v.word ? `\n**الكلمة:** ${v.word}` : ''}\n**عدد مخالفاته (آخر ${STRIKE_DAYS} أيام):** ${data.strikes[m.author.id].length}${deleted ? '\n🗑️ انحذفت الرسالة' : `\n⚠️ ما قدرت أحذفها — [🔗 الرسالة](${m.url})`}\n\n**📝 الرسالة كاملة:**\n${full ? `\`\`\`\n${full.replace(/```/g, 'ˋˋˋ').slice(0, 3400)}\n\`\`\`` : '—'}`)
     .setTimestamp();
   try { const log = await hidden(g, LOG_CH, true); await log.send({ embeds: [e], allowedMentions: { parse: [] } }); } catch (err) { console.error('⚠️ mod log:', err.message); }
   try { const owner = await client.users.fetch(g.ownerId); await owner.send({ embeds: [e] }); } catch { /* الخاص مقفل */ }
