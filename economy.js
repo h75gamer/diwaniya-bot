@@ -156,10 +156,12 @@ function shopEmbed(g) {
   const e = new EmbedBuilder().setColor(COLOR).setTitle('🛒 متجر الديوانية')
     .setDescription(items.length
       ? `${items.map((x, k) => `**${k + 1}.** <@&${x.roleId}> — ${fmt(x.price)}`).join('\n')}\n\nاختار من القائمة تحت عشان تشتري 👇\nتجمع ${COIN_NAME} من الفعاليات والتحديات و \`/يومي\``
-      : 'المتجر فاضي للحين 😅 صاحب السيرفر يضيف رتب قريب!');
+      : 'ما فيه رتب للبيع للحين — صاحب السيرفر يضيفها قريب!');
   const rows = items.length ? [new ActionRowBuilder().addComponents(new StringSelectMenuBuilder().setCustomId('eco_buy')
     .setPlaceholder('🛍️ اختار الرتبة اللي تبي تشتريها')
     .addOptions(items.slice(0, 25).map((x) => ({ label: (g.roles.cache.get(x.roleId)?.name || 'رتبة').slice(0, 90), description: `${x.price} ${COIN_NAME}`, value: x.roleId, emoji: '🏷️' }))))] : [];
+  // خدمات المتجر (روم خاص، فويس خاص، رتبة باسمك) من shop.js
+  try { const SH = require('./shop'); e.setDescription((e.data.description || '') + SH.serviceText()); rows.push(SH.serviceRow()); } catch (err) { console.error('⚠️ shop services:', err.message); }
   return { embeds: [e], components: rows };
 }
 
