@@ -69,7 +69,7 @@ async function category(g) {
   if (!cat) {
     cat = await g.channels.create({ name: CATEGORY, type: ChannelType.GuildCategory, permissionOverwrites: [
       { id: g.roles.everyone.id, deny: [P.ViewChannel] },
-      { id: client.user.id, allow: [P.ViewChannel, P.ManageChannels, P.ManageRoles, P.Connect, P.SendMessages] },
+      botOw(g),
     ] });
   }
   return cat;
@@ -87,6 +87,9 @@ const guestPerms = (type) => (type === 'voice'
   ? [P.ViewChannel, P.Connect, P.Speak, P.Stream, P.UseVAD, P.SendMessages, P.ReadMessageHistory]
   : [P.ViewChannel, P.SendMessages, P.ReadMessageHistory, P.AttachFiles, P.EmbedLinks, P.AddReactions]);
 const rel = (t) => `<t:${Math.floor(t / 1000)}:R>`;
+// ديسكورد يرفض إن البوت يعطي صلاحية ما يملكها — نفلتر حسب صلاحياته
+const safe = (g, arr) => arr.filter((p) => g.members.me.permissions.has(p));
+const botOw = (g) => ({ id: client.user.id, allow: safe(g, [P.ViewChannel, P.ManageChannels, P.Connect, P.SendMessages, P.ReadMessageHistory, P.EmbedLinks]) });
 
 async function createRoom(g, member, type) {
   const cat = await category(g);
@@ -94,9 +97,9 @@ async function createRoom(g, member, type) {
   const name = type === 'voice' ? `🎙️ فويس ${member.displayName}`.slice(0, 90) : `🏠│${member.displayName}`.slice(0, 90);
   const ow = [
     { id: g.roles.everyone.id, deny: [P.ViewChannel] },
-    { id: client.user.id, allow: [P.ViewChannel, P.ManageChannels, P.ManageRoles, P.Connect, P.SendMessages] },
-    { id: member.id, allow: ownerPerms(type) },
-    ...rec.guests.filter((id) => g.members.cache.has(id)).map((id) => ({ id, allow: guestPerms(type) })),
+    botOw(g),
+    { id: member.id, allow: safe(g, ownerPerms(type)) },
+    ...rec.guests.filter((id) => g.members.cache.has(id)).map((id) => ({ id, allow: safe(g, guestPerms(type)) })),
   ];
   const ch = await g.channels.create({ name, type: type === 'voice' ? ChannelType.GuildVoice : ChannelType.GuildText, parent: cat.id, permissionOverwrites: ow, reason: `روم خاص لـ ${member.user.tag}` });
   rec[type] = { id: ch.id, exp: Date.now() + DAYS * 86400000, warned: false };
@@ -138,7 +141,7 @@ async function buy(i, kind) {
   await i.deferReply({ flags: MessageFlags.Ephemeral });
   let ch;
   try { ch = await createRoom(g, member, kind); } catch (e) {
-    console.error('⚠️ room create:', e.message);
+    console.error('⚠️ room create:', e.message, e.rawError?.errors ? JSON.stringify(e.rawError.errors).slice(0, 300) : '');
     return i.editReply('⚠️ ما قدرت أسوي الروم — البوت يحتاج صلاحية **إدارة الرومات (Manage Channels)**. بلّغ الإدارة 🙏 (ما انخصم منك شي)');
   }
   ECO.add(i.user.id, -price, `شراء ${ITEMS[kind].label}`);
@@ -191,7 +194,7 @@ async function applyGuest(g, rec, uid, allow) {
   for (const type of ['text', 'voice']) {
     const ch = rec[type] && g.channels.cache.get(rec[type].id);
     if (!ch) continue;
-    if (allow) await ch.permissionOverwrites.edit(uid, Object.fromEntries(guestPerms(type).map((p) => [Object.keys(P).find((k) => P[k] === p), true])));
+    if (allow) await ch.permissionOverwrites.edit(uid, Object.fromEntries(safe(g, guestPerms(type)).map((p) => [Object.keys(P).find((k) => P[k] === p), true])));
     else {
       await ch.permissionOverwrites.delete(uid).catch(() => {});
       if (type === 'voice') { const m = g.members.cache.get(uid); if (m?.voice?.channelId === ch.id) await m.voice.disconnect('انطرد من روم خاص').catch(() => {}); }
