@@ -10,7 +10,7 @@ const KEY = process.env.GEMINI_API_KEY;
 const MODEL = process.env.MOD_MODEL || process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite';
 const LOG_CH = '🛡️│سجل-الرقابة';
 const DATA_CH = 'bot-mod-data';
-const BATCH_MS = 20000;
+const BATCH_MS = 6000;
 const STRIKE_DAYS = 7;
 // مدة التايم أوت حسب عدد المخالفات (بالدقائق) — أقصى شي يوم
 const LADDER = { 1: [0, 0, 10, 30, 60, 180], 2: [10, 60, 180, 720, 1440], 3: [1440] };
@@ -67,12 +67,13 @@ const RULES = `أنت مشرف رقابة في سيرفر ديسكورد عرب�
 - 2 (كتم مؤقت): سب قذر أو جنسي صريح، سب الأهل أو الأم أو الأخت، سب الدين، عنصرية أو طائفية أو احتقار قبيلة/جنسية/مذهب، تهديد جدي، تحرش لفظي.
 - 3 (خطير): ابتزاز، نشر معلومات شخصية لأحد، تحريض على إيذاء، محتوى جنسي فاضح أو استدراج قاصر.
 لا تعاقب على: كلمات عادية تشبه السب، اقتباس سب لشكوى ("فلان سبني وقال كذا")، نقاش عن السب، أغاني أو أمثال.
-رجّع JSON بس: مصفوفة عناصر فيها المخالفات فقط بالشكل {"id":"...","level":1|2|3,"reason":"سبب قصير بالعربي","word":"الكلمة المخالفة"}. إذا ما فيه مخالفات رجّع [].`;
+رجّع JSON بس: مصفوفة عناصر فيها المخالفات فقط بالشكل {"id":"رقم الرسالة","level":1|2|3,"reason":"سبب قصير بالعربي","word":"الكلمة المخالفة"}. إذا ما فيه مخالفات رجّع [].`;
 
 async function judge(batch) {
   const body = {
     systemInstruction: { parts: [{ text: RULES }] },
-    contents: [{ role: 'user', parts: [{ text: JSON.stringify(batch.map((m) => ({ id: m.id, author: m.name, text: m.text, before: m.before }))) }] }],
+    // أرقام قصيرة بدل آيدي ديسكورد الطويل — عشان الذكاء ما يخربط بين الرسايل
+    contents: [{ role: 'user', parts: [{ text: JSON.stringify(batch.map((m, k) => ({ id: String(k + 1), author: m.name, text: m.text, before: m.before }))) }] }],
     generationConfig: { responseMimeType: 'application/json', temperature: 0, maxOutputTokens: 800 },
   };
   const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`, {
@@ -107,8 +108,9 @@ async function punish(m, v) {
     action = ok ? `🔇 كتم ${mins >= 60 ? `${mins / 60} ساعة` : `${mins} دقيقة`}` : '⚠️ تحذير (ما قدرت أكتم — ناقص صلاحية)';
   }
   // تنبيه في الروم (يختفي بعد 15 ثانية) + خاص للعضو
+  console.log(`🛡️ مخالفة م${lvl} من ${m.author.tag}: ${deleted ? 'انحذفت' : 'ما انحذفت'} — ${v.word || v.reason}`);
   const note = lvl === 1 && !mins
-    ? `⚠️ ${m.author} انحذفت رسالتك — انتبه لكلامك، هذا تحذير ${n}/3 🙏 (السب ممنوع حتى لو زعلان)`
+    ? `⚠️ ${m.author} ${deleted ? 'انحذفت رسالتك — ' : ''}انتبه لكلامك، هذا تحذير ${n}/3 🙏 (السب ممنوع حتى لو زعلان)`
     : `🔇 ${m.author} انكتمت ${mins >= 60 ? `${mins / 60} ساعة` : `${mins} دقيقة`} بسبب: ${v.reason}`;
   m.channel.send({ content: note, allowedMentions: { users: [m.author.id] } }).then((x) => setTimeout(() => x.delete().catch(() => {}), 15000)).catch(() => {});
   m.author.send(`🛡️ رقابة الديوانية: ${action}\nالسبب: ${v.reason}\nرسالتك: «${full.slice(0, 300)}»\nإذا تشوف إنه غلط كلّم الإدارة من التذاكر 🎫`).catch(() => {});
@@ -125,14 +127,35 @@ async function punish(m, v) {
 
 async function flush() {
   if (!queue.length || !KEY || !data.on) { queue = data.on ? queue : []; return; }
-  const batch = queue.splice(0, 40);
+  const batch = queue.splice(0, 40).filter((b) => !handled.has(b.id));
+  if (!batch.length) return;
   let verdicts;
   try { verdicts = await judge(batch); } catch (e) { console.error('⚠️ mod gemini:', e.message); return; }
   for (const v of verdicts) {
-    const item = batch.find((b) => b.id === String(v.id));
+    const item = batch[Number(v.id) - 1];
     if (!item || !(Number(v.level) >= 1)) continue;
+    if (handled.has(item.id)) continue;
+    handled.add(item.id);
     await punish(item.msg, v).catch((e) => console.error('⚠️ punish:', e.message));
   }
+}
+
+// ───────── فلتر فوري (بدون انتظار الذكاء) للسب الواضح ─────────
+const handled = new Set();
+const norm = (t) => t.toLowerCase()
+  .replace(/[\u064B-\u065F\u0670\u0640]/g, '') // تشكيل وتطويل
+  .replace(/[أإآٱ]/g, 'ا').replace(/ى/g, 'ي').replace(/ة/g, 'ه')
+  .replace(/(.)\1{2,}/g, '$1'); // كلللب → كلب
+const W = (list) => new RegExp(`(^|[^\\u0621-\\u064Aa-z])(${list.join('|')})(?=$|[^\\u0621-\\u064Aa-z])`);
+// مستوى 2: قذر / جنسي / سب أهل
+const HARD = W(['قحبه', 'قحاب', 'شرموط[هي]?', 'شراميط', 'منيوك', 'منيك', 'نيك', 'انيك', 'ينيك', 'كس', 'كسمك', 'كس ?امك', 'كس ?اختك', 'زب', 'زبي', 'طيز', 'عرص', 'معرص', 'ديوث', 'لوطي', 'خول', 'ابن ?ال?(قحبه|شرموطه|زانيه)', 'يلعن ?(امك|ابوك|اهلك|دينك|والديك)', 'fuck', 'fucking', 'bitch', 'whore', 'pussy', 'dick']);
+// مستوى 1: سب صريح
+const SOFT = W(['كلب', 'كلبه', 'كلاب', 'يا ?كلب', 'ابن ?ال?كلب', 'حمار', 'حماره', 'حيوان', 'حيوانه', 'حقير', 'حقيره', 'زباله', 'معفن', 'معفنه', 'وصخ', 'وصخه', 'خنزير', 'جزمه', 'تبن', 'شقق', 'shit', 'bastard', 'asshole']);
+function quick(m) {
+  const t = ` ${norm(m.content)} `;
+  const h = t.match(HARD); if (h) return { level: 2, reason: 'لفظ قذر', word: h[2] };
+  const s = t.match(SOFT); if (s) return { level: 1, reason: 'سب صريح', word: s[2] };
+  return null;
 }
 
 const lastByCh = new Map();
@@ -143,6 +166,12 @@ function onMessage(m) {
   if (/^bot-|سجل-الرقابة/.test(m.channel.name || '')) return;
   const before = lastByCh.get(m.channelId) || '';
   lastByCh.set(m.channelId, `${m.member?.displayName || m.author.username}: ${m.content.slice(0, 160)}`);
+  const q = quick(m);
+  if (q) { // سب واضح → يُحذف فورًا
+    handled.add(m.id); if (handled.size > 500) handled.delete(handled.values().next().value);
+    punish(m, q).catch((e) => console.error('⚠️ punish:', e.message));
+    return;
+  }
   queue.push({ id: m.id, name: m.member?.displayName || m.author.username, text: m.content.slice(0, 400), before, msg: m });
   if (queue.length > 120) queue = queue.slice(-120);
 }
