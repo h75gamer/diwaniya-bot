@@ -325,4 +325,4 @@ function init(c) {
   process.on('SIGTERM', () => { save(true).catch(() => {}); });
 }
 
-module.exports = { init, handle, commands, get, add, set, top, fmt, isOwner, bankOf, total, COIN, COIN_NAME };
+module.exports = { init, handle, commands, get, add, set, top, fmt, isOwner, bankOf, total, shopEmbed, COIN, COIN_NAME };
