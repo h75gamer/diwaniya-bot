@@ -271,6 +271,22 @@ client.once('clientReady', async () => {
   await refreshTimes();
   for (const g of client.guilds.cache.values()) autoJoin(g);
   setInterval(tick, 30 * 1000);
+  // حارس الفويس: كل 30 ثانية يتأكد إن البوت فعلًا داخل روم القرآن
+  // (عند التحديث تشتغل نسختين لثواني، والقديمة لما تطفي تطلّع البوت من الفويس)
+  const miss = new Map();
+  setInterval(() => {
+    for (const g of client.guilds.cache.values()) {
+      const s = voice.get(g.id);
+      if (s?.stopped || !quranChannel(g)) continue;
+      if (g.members.me?.voice?.channelId) { miss.delete(g.id); continue; }
+      const n = (miss.get(g.id) || 0) + 1; miss.set(g.id, n);
+      if (n < 2) continue; // نتأكد مرتين قبل ما نعيد
+      miss.delete(g.id);
+      console.log('📻 البوت طلع من الفويس — نرجّعه');
+      if (s?.connection) { try { s.connection.destroy(); } catch {} s.connection = null; }
+      autoJoin(g);
+    }
+  }, 30 * 1000);
 });
 
 const findText = (guild, part) => guild.channels.cache.find(
